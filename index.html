@@ -77,6 +77,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .tag{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--chip)}
 .note{margin:4px 0 0;padding:8px 10px;border-radius:10px;background:var(--soft);font-size:14px}
 .note b{margin-right:4px}
+.pv{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;min-height:44px;margin-top:auto;padding:8px 12px;border-radius:10px;background:#00a8e1;color:#fff;font-weight:700;font-size:15px;text-decoration:none}
+.pv small{font-weight:500;font-size:13px;opacity:.95}
+.pv:hover{filter:brightness(1.08)}
+.pv:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.pv+.act{margin-top:0}
 .act{display:flex;gap:8px;margin-top:auto;padding-top:8px}
 .act button{flex:1;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .act button[aria-pressed=true]{background:var(--soft);border-color:var(--hat);font-weight:700}
@@ -211,6 +216,9 @@ function chipsHTML(list, set, key, sel) {
     const n = D.filter(d => match(d, key) && sel(d).includes(id)).length;
     return `<button class="${key==="pur"?"pur":"chip"}" data-k="${key}" data-v="${id}" aria-pressed="${set.has(id)}" ${n||set.has(id)?"":"disabled"}>${esc(lab)}<span>${n}話</span></button>`; }).join("");
 }
+const PV = ["B0CN5RFXMX", "B0CWDZ2XK6", "B0CZZL611T", "B0D33T73CT", "B0CXQ77H5P", "B0CTWM2XL4", "B0CWP22GMJ", "B0CV36Z2TH", "B0D2WDM4GW", "B0D2WDVG1S", "B0D33SM2TM", "B0D1WP2HC3", "B0CYPR3WHD", "B0CYGQ62P2", "B0GWKST9WK"];
+const FIRST = {}; D.forEach(d => { if (!(d.s in FIRST) || d.k < FIRST[d.s]) FIRST[d.s] = d.k; });
+function pv(d) { return `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${d.k - FIRST[d.s] + 1}話</small></a>`; }
 function card(d) {
   const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c);
   const pl = P.filter(p => d.P.includes(p[0])).map(p => `<span class="tag">${p[1]}</span>`).join("");
@@ -222,6 +230,7 @@ function card(d) {
 ${d.p?`<p class="note"><b>こんなときに</b>${esc(d.p)}</p>`:""}
 ${d.h?`<p class="note"><b>見たあとに</b>${esc(d.h)}</p>`:""}
 ${d.r?`<div class="meta">登場：${esc(d.r)}</div>`:""}
+${pv(d)}
 <div class="act"><button data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button></div>
 </article>`;
 }
