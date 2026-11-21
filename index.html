@@ -55,7 +55,7 @@ h2 small{font-size:14px;font-weight:500;color:var(--sub);margin-left:8px}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
 input[type=search],select{min-height:46px;font:inherit;font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
 .toggles{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--fur);outline-offset:2px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--fur);outline-offset:2px}
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-top:24px}
 .bar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-block:10px}
 .count{font-weight:800;font-size:20px;margin-right:auto}
@@ -85,6 +85,35 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .act{display:flex;gap:8px;margin-top:auto;padding-top:8px}
 .act button{flex:1;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .act button[aria-pressed=true]{background:var(--soft);border-color:var(--hat);font-weight:700}
+.act button.ed{flex:1.2}
+.memo{margin:4px 0 0;padding:8px 10px;border-radius:10px;border-left:4px solid var(--fur);background:var(--chip);font-size:14px;white-space:pre-wrap}
+.memo b{display:block;font-size:12px;color:var(--sub)}
+.badge{font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--fur);color:#fff}
+dialog{width:min(640px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:0;border:none;border-radius:18px;background:var(--bg);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(30,18,8,.55)}
+dialog form{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+.dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.dh h2{margin:0;font-size:18px;flex:1;line-height:1.35}
+.db{overflow:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+.df{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.df .sp{flex:1}
+.df .btn{padding:8px 14px}
+#dReset{background:transparent;border:none;color:var(--fur);text-decoration:underline;padding-inline:4px}
+#dReset:disabled{opacity:.4;text-decoration:none}
+.db h3{margin:8px 0 0;font-size:15px}
+.db .hint{margin:0;font-size:13px;color:var(--sub)}
+.db label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+.db label.mod{color:var(--fur);font-weight:700}
+.db input,.db textarea,.db select{font:inherit;font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);min-height:46px}
+.db textarea{min-height:90px;resize:vertical}
+.db #mMemo{min-height:110px}
+.pchk{display:flex;flex-wrap:wrap;gap:6px}
+.pchk label{flex-direction:row;align-items:center;gap:6px;padding:6px 10px;border:1.5px solid var(--line);border-radius:999px;font-size:14px;color:var(--ink);min-height:40px}
+.pchk input{min-height:0;width:18px;height:18px;margin:0;accent-color:var(--fur)}
+.x{min-width:44px;min-height:44px;border:none;background:transparent;color:var(--ink);font-size:24px;cursor:pointer;border-radius:10px}
+.manage{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.manage .btn{font-size:14px}
+.msg{min-height:1.6em;margin:6px 0 0;color:var(--fur);font-weight:700}
 .empty{grid-column:1/-1;text-align:center;padding:48px 16px;color:var(--sub)}
 footer{border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
 footer .wrap{padding-block:18px 28px}
@@ -117,6 +146,7 @@ footer .wrap{padding-block:18px 28px}
 <button class="chip" id="tWorld" aria-pressed="false">海外が舞台</button>
 <button class="chip" id="tUnseen" aria-pressed="false">まだ見ていない話だけ</button>
 <button class="chip" id="tFav" aria-pressed="false">お気に入りだけ</button>
+<button class="chip" id="tMemo" aria-pressed="false">メモ・修正のある話だけ</button>
 </div>
 </div>
 
@@ -129,7 +159,37 @@ footer .wrap{padding-block:18px 28px}
 
 <div class="wrap"><div class="results" id="results"></div></div>
 </main>
-<footer><div class="wrap">回は日本語版の通算回、話数はシーズン内の番号です。あらすじと分類（学びの分野・困りごと・季節・家でできること）は公開情報をもとにした独自のまとめで、公式の分類ではありません。「見た」「お気に入り」はこの端末のブラウザにだけ保存されます。</div></footer>
+<dialog id="dlg" aria-labelledby="dTitle">
+<form method="dialog" id="dForm">
+<div class="dh"><h2 id="dTitle"></h2><button type="button" class="x" id="dX" aria-label="閉じる">×</button></div>
+<div class="db">
+<label>メモ（気づいたこと、子どもの反応など）<textarea id="mMemo" placeholder="例：恐竜好きの娘が夢中で見ていた。見たあと公園で化石さがし。"></textarea></label>
+<h3>話の内容を修正</h3>
+<p class="hint">変えた項目は茶色の文字になります。検索や分類にもすぐ反映されます。</p>
+<div id="dFields" style="display:flex;flex-direction:column;gap:12px"></div>
+<label id="pLab">学びの目的（自動で付いた分類を変えられます）</label>
+<div class="pchk" id="dPur"></div>
+</div>
+<div class="df">
+<button type="button" class="btn ghost" id="dReset">修正を戻す</button>
+<span class="sp"></span>
+<button type="button" class="btn ghost" id="dCancel">やめる</button>
+<button type="submit" class="btn" id="dSave">保存する</button>
+</div>
+</form>
+</dialog>
+<footer><div class="wrap">
+<h3 style="margin:0;font-size:16px;color:var(--ink)">メモ・修正のデータ</h3>
+<p style="margin:4px 0 0">メモや修正はこの端末のブラウザにだけ保存されます。機種変更や別の端末で使うときは、バックアップを書き出して読み込んでください。<span id="stat"></span></p>
+<div class="manage">
+<button class="btn ghost" id="bkOut">バックアップを書き出す</button>
+<button class="btn ghost" id="bkIn">バックアップを読み込む</button>
+<button class="btn ghost" id="csvOut">修正を反映したCSVを書き出す</button>
+<input type="file" id="bkFile" accept=".json,application/json" hidden>
+</div>
+<p class="msg" id="msg" role="status"></p>
+<hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+回は日本語版の通算回、話数はシーズン内の番号です。あらすじと分類（学びの分野・困りごと・季節・家でできること）は公開情報をもとにした独自のまとめで、公式の分類ではありません。「見た」「お気に入り」はこの端末のブラウザにだけ保存されます。</div></footer>
 
 <script>
 {
@@ -175,25 +235,40 @@ const S = [
  ["行事",/ハロウィン|バレンタイン|母の日|父の日|春節|大みそか|うるう|アースデイ|グラウンドホッグ|結婚式|記念日|エッグ/],
  ["夜・星空",/夜空|流星群/],["お祭り・おでかけ",/お祭り|パレード|遊園地|まつり|キャンプ/],["海",/海/]
 ];
-D.forEach(d => {
-  const base = d.g + " " + d.t;
-  d.P = P.filter(p => p[2].test(base) || (p[0]==="sekai" && d.n)).map(p => p[0]);
+const F = [["j","邦題"],["e","原題"],["b","舞台"],["g","教育カテゴリー"],["t","具体的テーマ・学び"],["a","対象年齢目安","sel",["3歳〜","4歳〜"]],
+ ["y","あらすじ","area"],["n","国・地域"],["m","季節・行事"],["p","生活の困りごと"],["h","家でできる実験・工作"],["r","登場キャラクター（「、」で区切る）"],
+ ["pv","Prime Videoでのシーズン内の話数（ずれていたら直す）","num"]];
+const ORIG = {}; D.forEach(d => { ORIG[d.c] = {}; F.forEach(f => ORIG[d.c][f[0]] = d[f[0]] ?? ""); });
+const autoP = d => P.filter(p => p[2].test(d.g + " " + d.t) || (p[0]==="sekai" && d.n)).map(p => p[0]);
+let store = {seen:[], fav:[], memo:{}, edit:{}};
+try { store = Object.assign(store, JSON.parse(localStorage.getItem("georgeLearn.v1") || "{}")); } catch(e) {}
+const save = () => { try { localStorage.setItem("georgeLearn.v1", JSON.stringify(store)); return true; } catch(e) { return false; } };
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e) {}
+function derive(d) {
+  Object.assign(d, ORIG[d.c]);
+  const ed = store.edit[d.c] || {};
+  F.forEach(f => { if (f[0] in ed) d[f[0]] = ed[f[0]]; });
+  d.P = Array.isArray(ed.P) ? ed.P.slice() : autoP(d);
   d.K = K.filter(k => d.p && k[1].test(d.p)).map(k => k[0]);
   d.S = S.filter(s => d.m && s[1].test(d.m)).map(s => s[0]);
-  d.R = d.r ? d.r.split("、") : [];
-  d.txt = [d.j,d.e,d.g,d.t,d.y,d.n,d.m,d.p,d.h,d.r,d.b].join(" ").toLowerCase();
-});
-let store = {seen:[],fav:[]};
-try { store = Object.assign(store, JSON.parse(localStorage.getItem("georgeLearn.v1") || "{}")); } catch(e) {}
-const save = () => { try { localStorage.setItem("georgeLearn.v1", JSON.stringify(store)); } catch(e) {} };
-const st = {pur:new Set(), kom:new Set(), sea:new Set(), q:"", age:"", chr:"", ssn:"", home:false, world:false, unseen:false, fav:false, sort:"ep"};
+  d.R = d.r ? d.r.split(/[、,，]\s*/).map(x => x.trim()).filter(Boolean) : [];
+  d.memo = store.memo[d.c] || "";
+  d.mod = Object.keys(ed).length > 0;
+  d.txt = [d.j,d.e,d.g,d.t,d.y,d.n,d.m,d.p,d.h,d.r,d.b,d.memo].join(" ").toLowerCase();
+}
+D.forEach(derive);
+const st = {pur:new Set(), kom:new Set(), sea:new Set(), q:"", age:"", chr:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false, sort:"ep"};
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const chars = [...new Set(D.flatMap(d => d.R))];
-const freq = c => D.filter(d => d.R.includes(c)).length;
-chars.sort((a,b) => freq(b) - freq(a));
-$("chr").innerHTML += chars.map(c => `<option>${esc(c)}</option>`).join("");
+function fillChars() {
+  const chars = [...new Set(D.flatMap(d => d.R))];
+  const freq = c => D.filter(d => d.R.includes(c)).length;
+  chars.sort((a,b) => freq(b) - freq(a));
+  if (st.chr && !chars.includes(st.chr)) st.chr = "";
+  $("chr").innerHTML = `<option value="">すべて</option>` + chars.map(c => `<option${c===st.chr?" selected":""}>${esc(c)}</option>`).join("");
+}
+fillChars();
 $("ssn").innerHTML += [...Array(15)].map((_,i) => `<option value="${i+1}">シーズン${i+1}</option>`).join("");
 
 function match(d, skip) {
@@ -209,6 +284,7 @@ function match(d, skip) {
   if (st.world && !d.n) return false;
   if (st.unseen && store.seen.includes(d.c)) return false;
   if (st.fav && !store.fav.includes(d.c)) return false;
+  if (st.memo && !d.memo && !d.mod) return false;
   return true;
 }
 function chipsHTML(list, set, key, sel) {
@@ -218,20 +294,22 @@ function chipsHTML(list, set, key, sel) {
 }
 const PV = ["B0CN5RFXMX", "B0CWDZ2XK6", "B0CZZL611T", "B0D33T73CT", "B0CXQ77H5P", "B0CTWM2XL4", "B0CWP22GMJ", "B0CV36Z2TH", "B0D2WDM4GW", "B0D2WDVG1S", "B0D33SM2TM", "B0D1WP2HC3", "B0CYPR3WHD", "B0CYGQ62P2", "B0GWKST9WK"];
 const FIRST = {}; D.forEach(d => { if (!(d.s in FIRST) || d.k < FIRST[d.s]) FIRST[d.s] = d.k; });
-function pv(d) { return `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${d.k - FIRST[d.s] + 1}話</small></a>`; }
+function pv(d) { const n = d.pv !== "" && d.pv != null ? d.pv : d.k - FIRST[d.s] + 1;
+  return `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${esc(n)}話</small></a>`; }
 function card(d) {
   const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c);
   const pl = P.filter(p => d.P.includes(p[0])).map(p => `<span class="tag">${p[1]}</span>`).join("");
   return `<article class="card" id="c-${d.c}">
-<div class="meta"><b>${d.c}</b><span>第${d.k}回</span><span>${d.a}</span><span>${esc(d.b)}</span></div>
+<div class="meta"><b>${d.c}</b><span>第${d.k}回</span><span>${esc(d.a)}</span><span>${esc(d.b)}</span>${d.mod?`<span class="badge">修正あり</span>`:""}</div>
 <h3>${esc(d.j)}</h3><div class="en">${esc(d.e)}</div>
 <p class="theme">${esc(d.t)}</p><p class="syn">${esc(d.y)}</p>
 <div class="tags">${pl}${d.m?`<span class="tag">${esc(d.m)}</span>`:""}${d.n?`<span class="tag">${esc(d.n)}</span>`:""}</div>
 ${d.p?`<p class="note"><b>こんなときに</b>${esc(d.p)}</p>`:""}
 ${d.h?`<p class="note"><b>見たあとに</b>${esc(d.h)}</p>`:""}
 ${d.r?`<div class="meta">登場：${esc(d.r)}</div>`:""}
+${d.memo?`<p class="memo"><b>メモ</b>${esc(d.memo)}</p>`:""}
 ${pv(d)}
-<div class="act"><button data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button></div>
+<div class="act"><button data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
 </article>`;
 }
 let shown = [];
@@ -251,6 +329,7 @@ document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.k) { const set = {pur:st.pur, kom:st.kom, sea:st.sea}[b.dataset.k];
     set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v); render(); return; }
+  if (b.dataset.edit) { openEdit(b.dataset.edit); return; }
   if (b.dataset.a) { const arr = store[b.dataset.a], c = b.dataset.c, i = arr.indexOf(c);
     i < 0 ? arr.push(c) : arr.splice(i, 1); save();
     const on = i < 0; b.setAttribute("aria-pressed", on);
@@ -258,7 +337,7 @@ document.addEventListener("click", e => {
     if (st.unseen || st.fav) render(); return; }
 });
 const tg = (id, key) => $(id).addEventListener("click", () => { st[key] = !st[key]; $(id).setAttribute("aria-pressed", st[key]); render(); });
-tg("tHome","home"); tg("tWorld","world"); tg("tUnseen","unseen"); tg("tFav","fav");
+tg("tHome","home"); tg("tWorld","world"); tg("tUnseen","unseen"); tg("tFav","fav"); tg("tMemo","memo");
 let tmr; $("q").addEventListener("input", e => { clearTimeout(tmr); tmr = setTimeout(() => { st.q = e.target.value.trim(); render(); }, 150); });
 ["age","chr","ssn","sort"].forEach(id => $(id).addEventListener("change", e => { st[id] = e.target.value; render(); }));
 $("pick").addEventListener("click", () => {
@@ -268,9 +347,97 @@ $("pick").addEventListener("click", () => {
   if (el) { el.classList.add("hl"); el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center"}); }
 });
 $("clear").addEventListener("click", () => {
-  st.pur.clear(); st.kom.clear(); st.sea.clear(); Object.assign(st, {q:"", age:"", chr:"", ssn:"", home:false, world:false, unseen:false, fav:false});
+  st.pur.clear(); st.kom.clear(); st.sea.clear(); Object.assign(st, {q:"", age:"", chr:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false});
   $("q").value = ""; ["age","chr","ssn"].forEach(id => $(id).value = "");
-  ["tHome","tWorld","tUnseen","tFav"].forEach(id => $(id).setAttribute("aria-pressed", "false")); render();
+  ["tHome","tWorld","tUnseen","tFav","tMemo"].forEach(id => $(id).setAttribute("aria-pressed", "false")); render();
+});
+// ---- メモ・修正
+const dlg = $("dlg"); let cur = null, opener = null;
+const byC = c => D.find(d => d.c === c);
+function fieldHTML(f, d) {
+  const [k, lab, type, opts] = f, v = d[k] ?? "", mod = store.edit[d.c] && k in store.edit[d.c];
+  const ph = k==="pv" ? `placeholder="${d.k - FIRST[d.s] + 1}"` : `placeholder="${esc(ORIG[d.c][k] || "")}"`;
+  let inp;
+  if (type==="area") inp = `<textarea data-f="${k}">${esc(v)}</textarea>`;
+  else if (type==="sel") inp = `<select data-f="${k}">${opts.map(o => `<option${o===v?" selected":""}>${o}</option>`).join("")}</select>`;
+  else if (type==="num") inp = `<input type="number" inputmode="numeric" min="1" max="40" data-f="${k}" value="${esc(v)}" ${ph}>`;
+  else inp = `<input type="text" data-f="${k}" value="${esc(v)}" ${ph}>`;
+  return `<label class="${mod?"mod":""}">${lab}${inp}</label>`;
+}
+function openEdit(c) {
+  cur = byC(c); if (!cur) return; opener = document.activeElement;
+  $("dTitle").textContent = `${cur.c}　${cur.j}`;
+  $("mMemo").value = store.memo[c] || "";
+  $("dFields").innerHTML = F.map(f => fieldHTML(f, cur)).join("");
+  $("dPur").innerHTML = P.map(p => `<label><input type="checkbox" value="${p[0]}"${cur.P.includes(p[0])?" checked":""}>${p[1]}</label>`).join("");
+  $("pLab").className = store.edit[c] && Array.isArray(store.edit[c].P) ? "mod" : "";
+  $("dReset").disabled = !store.edit[c];
+  dlg.showModal(); $("mMemo").focus();
+}
+function closeEdit() { dlg.close(); if (opener && document.body.contains(opener)) opener.focus(); }
+$("dX").addEventListener("click", closeEdit); $("dCancel").addEventListener("click", closeEdit);
+dlg.addEventListener("click", e => { if (e.target === dlg) closeEdit(); });
+dlg.addEventListener("input", e => {
+  const el = e.target; if (!el.dataset.f) return;
+  const o = String(ORIG[cur.c][el.dataset.f] ?? ""); el.closest("label").className = el.value.trim() !== o ? "mod" : "";
+});
+$("dForm").addEventListener("submit", e => {
+  e.preventDefault(); if (!cur) return;
+  const c = cur.c, memo = $("mMemo").value.trim(), ed = {};
+  dlg.querySelectorAll("[data-f]").forEach(el => {
+    const k = el.dataset.f, v = el.value.trim(), o = String(ORIG[c][k] ?? "");
+    if (v !== o) ed[k] = k==="pv" && v !== "" ? Number(v) : v;
+  });
+  const tmp = Object.assign({}, ORIG[c], ed), auto = autoP(tmp).sort().join();
+  const chk = [...dlg.querySelectorAll("#dPur input:checked")].map(x => x.value);
+  if (chk.slice().sort().join() !== auto) ed.P = chk;
+  memo ? store.memo[c] = memo : delete store.memo[c];
+  Object.keys(ed).length ? store.edit[c] = ed : delete store.edit[c];
+  const ok = save(); derive(cur); fillChars(); render(); closeEdit(); stat();
+  flash(ok ? `${c} を保存しました` : "保存できませんでした（ブラウザの設定でデータの保存が止められている可能性があります）");
+  const el = $("c-" + c); if (el) { el.classList.add("hl"); setTimeout(() => el.classList.remove("hl"), 1200); }
+});
+$("dReset").addEventListener("click", () => {
+  if (!cur) return; delete store.edit[cur.c]; save(); derive(cur);
+  $("dFields").innerHTML = F.map(f => fieldHTML(f, cur)).join("");
+  $("dPur").innerHTML = P.map(p => `<label><input type="checkbox" value="${p[0]}"${cur.P.includes(p[0])?" checked":""}>${p[1]}</label>`).join("");
+  $("pLab").className = ""; $("dReset").disabled = true; fillChars(); render(); stat();
+  flash(`${cur.c} の修正を元に戻しました（メモは残っています）`);
+});
+let ft; function flash(t) { $("msg").textContent = t; clearTimeout(ft); ft = setTimeout(() => $("msg").textContent = "", 6000); }
+function stat() { $("stat").textContent = `（いまの記録：メモ ${Object.keys(store.memo).length}話・修正 ${Object.keys(store.edit).length}話・見た ${store.seen.length}話・お気に入り ${store.fav.length}話）`; }
+stat();
+function download(name, text, type) {
+  const blob = new Blob([text], {type}), a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+const today = () => { const t = new Date(); return `${t.getFullYear()}${String(t.getMonth()+1).padStart(2,"0")}${String(t.getDate()).padStart(2,"0")}`; };
+$("bkOut").addEventListener("click", () => {
+  download(`george-backup-${today()}.json`, JSON.stringify(Object.assign({app:"CG-episode-finder", saved:new Date().toISOString()}, store), null, 1), "application/json");
+  flash("バックアップを書き出しました");
+});
+$("bkIn").addEventListener("click", () => $("bkFile").click());
+$("bkFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text());
+    if (!j || typeof j !== "object" || !Array.isArray(j.seen) || !Array.isArray(j.fav)) throw 0;
+    const ok = new Set(D.map(d => d.c)), only = o => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ok.has(k)));
+    store.seen = [...new Set([...store.seen, ...j.seen.filter(c => ok.has(c))])];
+    store.fav = [...new Set([...store.fav, ...j.fav.filter(c => ok.has(c))])];
+    Object.assign(store.memo, only(j.memo)); Object.assign(store.edit, only(j.edit));
+    save(); D.forEach(derive); fillChars(); render(); stat();
+    flash(`読み込みました（メモ ${Object.keys(only(j.memo)).length}話・修正 ${Object.keys(only(j.edit)).length}話）`);
+  } catch(err) { flash("このファイルは読み込めませんでした。書き出したバックアップ（.json）を選んでください"); }
+});
+$("csvOut").addEventListener("click", () => {
+  const q = v => { v = String(v ?? ""); return /[",\n\r]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; };
+  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事","生活の困りごと","家でできる実験・工作","登場キャラクター","学びの目的（アプリ）","Prime Video話数","修正あり","メモ"];
+  const rows = D.map(d => [d.k, d.s, d.c, `${d.j} / ${d.e}`, d.b, d.g, d.t, d.a, d.y, d.n, d.m, d.p, d.h, d.r,
+    d.P.map(id => P.find(p => p[0]===id)[1]).join("、"), d.pv !== "" && d.pv != null ? d.pv : d.k - FIRST[d.s] + 1, d.mod ? "○" : "", d.memo]);
+  download(`osaru_george_${today()}.csv`, "﻿" + [head, ...rows].map(r => r.map(q).join(",")).join("\r\n"), "text/csv");
+  flash("CSVを書き出しました");
 });
 render();
 }
