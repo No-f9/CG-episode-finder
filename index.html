@@ -100,12 +100,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .pv:hover{filter:brightness(1.08)}
 .pv:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .pv+.act{margin-top:0}
-.act{display:flex;gap:8px;margin-top:auto;padding-top:8px}
+.act{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:8px}
 .act button{flex:1;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .act button[aria-pressed=true]{background:var(--soft);border-color:var(--hat);font-weight:700}
-:root{--ok:light-dark(#2f7d32,#7fcf83);--okbg:light-dark(#eaf6e7,#18261a);--okline:light-dark(#9bcf92,#3e6b40)}
+:root{--rec:light-dark(#1f5fae,#7fb2f0);--ok:light-dark(#2f7d32,#7fcf83);--okbg:light-dark(#eaf6e7,#18261a);--okline:light-dark(#9bcf92,#3e6b40)}
 .card.seen{background:var(--okbg);border-color:var(--okline);border-width:2px}
 .card.seen h3::before{content:"✓ ";color:var(--ok)}
+.act button.rc[aria-pressed=true]{background:var(--rec);border-color:var(--rec);color:#fff;font-weight:800}
+.recb{font-size:12px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--rec);color:#fff}
+.enb{font-size:12px;font-weight:800;padding:1px 8px;border-radius:999px;border:1.5px solid var(--rec);color:var(--rec)}
+.pv .en2{font-weight:800;background:#fff;color:#00739b;border-radius:999px;padding:0 8px;font-size:12px}
 .act button.sn[aria-pressed=true]{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:800}
 .seenb{font-size:12px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--ok);color:#fff}
 .prog{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:14px 0 0;padding:12px 14px;border:1.5px solid var(--okline);border-radius:14px;background:var(--okbg)}
@@ -209,6 +213,8 @@ footer .wrap{padding-block:18px 28px}
 <button class="chip" id="tWorld" aria-pressed="false">海外が舞台</button>
 <button class="chip" id="tUnseen" aria-pressed="false">まだ見ていない話だけ</button>
 <button class="chip" id="tFav" aria-pressed="false">お気に入りだけ</button>
+<button class="chip" id="tEn" aria-pressed="false">英語でも見られる</button>
+<button class="chip" id="tRec" aria-pressed="false">録画した話だけ</button>
 <button class="chip" id="tMemo" aria-pressed="false">メモ・修正のある話だけ</button>
 </div>
 </div>
@@ -276,7 +282,7 @@ footer .wrap{padding-block:18px 28px}
 </div>
 <p class="msg" id="msg" role="status"></p>
 <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
-回は日本語版の通算回、話数はシーズン内の番号です。あらすじと分類（学びの目的・困りごと・季節・家でできること）は公開情報をもとにした独自のまとめで、公式の分類ではありません。</div></footer>
+回は日本語版の通算回、話数はシーズン内の番号です。あらすじと分類（学びの目的・困りごと・季節・家でできること）は公開情報をもとにした独自のまとめで、公式の分類ではありません。<br>英語音声：Prime Video（日本）で英語を選べるのはシーズン14・15です（2026年11月時点）。NHKの放送は二か国語なので、「録画した」を押した話も「英語でも見られる」に入ります。</div></footer>
 
 <script>
 {
@@ -356,7 +362,7 @@ const DEF = {
 };
 
 // ---------- 保存データ ----------
-let store = {seen:[], fav:[], memo:{}, edit:{}, opt:{}, seenAt:{}};
+let store = {seen:[], fav:[], memo:{}, edit:{}, opt:{}, seenAt:{}, rec:[], recAt:{}};
 try { store = Object.assign(store, JSON.parse(localStorage.getItem("georgeLearn.v1") || "{}")); } catch(e) {}
 const save = () => { try { localStorage.setItem("georgeLearn.v1", JSON.stringify(store)); return true; } catch(e) { return false; } };
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e) {}
@@ -452,7 +458,7 @@ document.addEventListener("keydown", e => {
 }, true);
 
 // ---------- 検索画面 ----------
-const st = {pur:new Set(), kom:new Set(), sea:new Set(), chr:new Set(), q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false, sort:"ep"};
+const st = {pur:new Set(), kom:new Set(), sea:new Set(), chr:new Set(), q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false, en:false, rec:false, sort:"ep"};
 function buildFilters() {
   ["pur","kom","sea","chr"].forEach(k => { const f = k==="pur" ? "cat" : k; [...st[k]].forEach(v => { if (!(v in LAB[f])) st[k].delete(v); }); });
   if (st.age && !(st.age in LAB.age)) st.age = "";
@@ -470,7 +476,8 @@ function progress() {
   const ids = new Set(D.map(d => d.c)), n = store.seen.filter(c => ids.has(c)).length, all = D.length, pc = Math.round(n / all * 100);
   $("prog").innerHTML = `<span class="pt">見た話</span><b>${n} / ${all}話</b><span class="pn">（${pc}%）</span>
 <span class="pb" role="progressbar" aria-label="見た話の割合" aria-valuemin="0" aria-valuemax="${all}" aria-valuenow="${n}"><i style="width:${n / all * 100}%"></i></span>
-<span class="pn">${n === all ? "全話見ました！" : `あと${all - n}話`}</span>`;
+<span class="pn">${n === all ? "全話見ました！" : `あと${all - n}話`}</span>
+<span class="pn" style="width:100%">録画 ${store.rec.filter(c => ids.has(c)).length}話・英語でも見られる ${D.filter(isEn).length}話</span>`;
   const sn = shown.filter(d => store.seen.includes(d.c)).length;
   const el = $("count").querySelector(".seenc"); if (el) el.textContent = `見た ${sn}`;
 }
@@ -488,6 +495,8 @@ function match(d, skip) {
   if (st.world && !d.V.country.length) return false;
   if (st.unseen && store.seen.includes(d.c)) return false;
   if (st.fav && !store.fav.includes(d.c)) return false;
+  if (st.en && !isEn(d)) return false;
+  if (st.rec && !store.rec.includes(d.c)) return false;
   if (st.memo && !d.memo && !d.mod) return false;
   return true;
 }
@@ -498,15 +507,17 @@ function chipsHTML(key, field) {
     return `<button class="${key==="pur"?"pur":"chip"}" data-k="${key}" data-v="${esc(x.id)}" aria-pressed="${set.has(x.id)}" ${n||set.has(x.id)?"":"disabled"}>${esc(x.label)}<span>${n}話</span></button>`; }).join("");
 }
 const PV = ["B0CN5RFXMX","B0CWDZ2XK6","B0CZZL611T","B0D33T73CT","B0CXQ77H5P","B0CTWM2XL4","B0CWP22GMJ","B0CV36Z2TH","B0D2WDM4GW","B0D2WDVG1S","B0D33SM2TM","B0D1WP2HC3","B0CYPR3WHD","B0CYGQ62P2","B0GWKST9WK"];
-const pv = d => `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${esc(pvNum(d))}話</small></a>`;
+const EN_PRIME = new Set([14, 15]); // Prime Video（日本）で英語音声が選べるシーズン
+const isEn = d => EN_PRIME.has(d.s) || store.rec.includes(d.c);
+const pv = d => `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${esc(pvNum(d))}話</small>${EN_PRIME.has(d.s)?`<span class="en2">英語あり</span>`:""}</a>`;
 const md = t => { const x = new Date(t); return isNaN(x) ? "" : `${x.getMonth()+1}/${x.getDate()}`; };
 const seenBadge = c => `<span class="seenb">見た${store.seenAt[c] ? " " + md(store.seenAt[c]) : ""}</span>`;
 function card(d) {
-  const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c), V = d.V;
+  const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c), rec = store.rec.includes(d.c), V = d.V;
   const tags = [...labs("cat", V.cat), ...labs("sea", V.sea), ...labs("country", V.country)].map(t => `<span class="tag">${esc(t)}</span>`).join("");
   const kom = labs("kom", V.kom).join("、"), chr = labs("chr", V.chr).join("、"), but = labs("butai", V.butai).join("・");
   return `<article class="card${seen?" seen":""}" id="c-${d.c}">
-<div class="meta"><b>${d.c}</b>${seen?seenBadge(d.c):""}<span>第${d.k}回</span>${labs("age", V.age).map(a => `<span>${esc(a)}</span>`).join("")}${but?`<span>${esc(but)}</span>`:""}${d.mod?`<span class="badge">修正あり</span>`:""}</div>
+<div class="meta"><b>${d.c}</b>${seen?seenBadge(d.c):""}${rec?`<span class="recb">録画${store.recAt[d.c] ? " " + md(store.recAt[d.c]) : ""}</span>`:""}${isEn(d)?`<span class="enb">英語OK</span>`:""}<span>第${d.k}回</span>${labs("age", V.age).map(a => `<span>${esc(a)}</span>`).join("")}${but?`<span>${esc(but)}</span>`:""}${d.mod?`<span class="badge">修正あり</span>`:""}</div>
 <h3>${esc(d.j)}</h3><div class="en">${esc(d.e)}</div>
 <p class="theme">${esc(d.t)}</p><p class="syn">${esc(d.y)}</p>
 ${tags?`<div class="tags">${tags}</div>`:""}
@@ -515,7 +526,7 @@ ${d.h?`<p class="note"><b>見たあとに</b>${esc(d.h)}</p>`:""}
 ${chr?`<div class="meta">登場：${esc(chr)}</div>`:""}
 ${d.memo?`<p class="memo"><b>メモ</b>${esc(d.memo)}</p>`:""}
 ${pv(d)}
-<div class="act"><button class="sn" data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"✓ 見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
+<div class="act"><button class="sn" data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"✓ 見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="rc" data-a="rec" data-c="${d.c}" aria-pressed="${rec}">${rec?"● 録画済み":"録画した"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
 </article>`;
 }
 let shown = [], limit = 30, lastSig = "";
@@ -530,7 +541,7 @@ function condList() {
   if (st.q) L.push(["q", "", `「${st.q}」`]);
   if (st.age) L.push(["age", "", LAB.age[st.age] || st.age]);
   if (st.ssn) L.push(["ssn", "", `シーズン${st.ssn}`]);
-  [["home","家でできる実験・工作"],["world","海外が舞台"],["unseen","まだ見ていない"],["fav","お気に入り"],["memo","メモ・修正あり"]].forEach(([k, l]) => st[k] && L.push([k, "", l]));
+  [["home","家でできる実験・工作"],["world","海外が舞台"],["unseen","まだ見ていない"],["fav","お気に入り"],["memo","メモ・修正あり"],["en","英語でも見られる"],["rec","録画した話"]].forEach(([k, l]) => st[k] && L.push([k, "", l]));
   return L.filter(x => x[2]);
 }
 function renderCond() {
@@ -542,11 +553,11 @@ function renderCond() {
 function syncControls() {
   $("q").value = st.q; $("age").value = st.age; $("ssn").value = st.ssn; msText($("chrF"));
   $("chrF").querySelectorAll(".ms-opt input").forEach(i => i.checked = st.chr.has(i.value));
-  [["tHome","home"],["tWorld","world"],["tUnseen","unseen"],["tFav","fav"],["tMemo","memo"]].forEach(([id, k]) => $(id).setAttribute("aria-pressed", st[k]));
+  [["tHome","home"],["tWorld","world"],["tUnseen","unseen"],["tFav","fav"],["tMemo","memo"],["tEn","en"],["tRec","rec"]].forEach(([id, k]) => $(id).setAttribute("aria-pressed", st[k]));
 }
 function clearAll() {
   ["pur","kom","sea","chr"].forEach(k => st[k].clear());
-  Object.assign(st, {q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false});
+  Object.assign(st, {q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false, en:false, rec:false});
   syncControls(); render();
 }
 function render() {
@@ -582,20 +593,17 @@ document.addEventListener("click", e => {
     const nx = $("cond").querySelector("button"); (nx || $("count")).focus?.(); return; }
   if (b.dataset.a) { const arr = store[b.dataset.a], c = b.dataset.c, i = arr.indexOf(c), on = i < 0;
     on ? arr.push(c) : arr.splice(i, 1);
-    if (b.dataset.a === "seen") { on ? store.seenAt[c] = new Date().toISOString() : delete store.seenAt[c]; }
+    const at = {seen:"seenAt", rec:"recAt"}[b.dataset.a];
+    if (at) { on ? store[at][c] = new Date().toISOString() : delete store[at][c]; }
     save(); stat();
-    b.setAttribute("aria-pressed", on);
-    if (b.dataset.a === "seen") {
-      b.textContent = on ? "✓ 見た" : "見たら押す";
-      const cd = b.closest(".card"); cd.classList.toggle("seen", on);
-      const meta = cd.querySelector(".meta"), old = meta.querySelector(".seenb");
-      if (old) old.remove(); if (on) meta.querySelector("b").insertAdjacentHTML("afterend", seenBadge(c));
-      progress(); seasonOpts();
-    } else b.textContent = on ? "お気に入り済み" : "お気に入り";
-    if (st.unseen || st.fav) render(); return; }
+    const a = b.dataset.a, cd = b.closest(".card");
+    if (st.unseen || st.fav || st.rec || st.en) render();
+    else { if (cd) cd.outerHTML = card(byC(c)); progress(); seasonOpts(); }
+    const nb = document.querySelector(`#c-${c} [data-a="${a}"]`); if (nb) nb.focus({preventScroll:true});
+    return; }
 });
 const tg = (id, key) => $(id).addEventListener("click", () => { st[key] = !st[key]; $(id).setAttribute("aria-pressed", st[key]); render(); });
-tg("tHome","home"); tg("tWorld","world"); tg("tUnseen","unseen"); tg("tFav","fav"); tg("tMemo","memo");
+tg("tHome","home"); tg("tWorld","world"); tg("tUnseen","unseen"); tg("tFav","fav"); tg("tMemo","memo"); tg("tEn","en"); tg("tRec","rec");
 let tmr; $("q").addEventListener("input", e => { clearTimeout(tmr); tmr = setTimeout(() => { st.q = e.target.value.trim(); render(); }, 150); });
 ["age","ssn","sort"].forEach(id => $(id).addEventListener("change", e => { st[id] = e.target.value; render(); }));
 $("pick").addEventListener("click", () => {
@@ -751,7 +759,7 @@ $("mResetF").addEventListener("click", () => {
 let ft; function flash(t) { $("msg").textContent = t; clearTimeout(ft); ft = setTimeout(() => $("msg").textContent = "", 6000); }
 function stat() {
   const oc = Object.values(store.opt).reduce((n, o) => n + (o.add||[]).length + (o.del||[]).length + Object.keys(o.ren||{}).length, 0);
-  $("stat").textContent = `（いまの記録：メモ ${Object.keys(store.memo).length}話・修正 ${Object.keys(store.edit).length}話・見た ${store.seen.length}話・お気に入り ${store.fav.length}話・選択肢の変更 ${oc}件）`;
+  $("stat").textContent = `（いまの記録：メモ ${Object.keys(store.memo).length}話・修正 ${Object.keys(store.edit).length}話・見た ${store.seen.length}話・お気に入り ${store.fav.length}話・録画 ${store.rec.length}話・選択肢の変更 ${oc}件）`;
 }
 function download(name, text, type) {
   const blob = new Blob([text], {type}), a = document.createElement("a");
@@ -773,6 +781,8 @@ $("bkFile").addEventListener("change", async e => {
     store.seen = uniq([...store.seen, ...j.seen.filter(c => ok.has(c))]);
     store.fav = uniq([...store.fav, ...j.fav.filter(c => ok.has(c))]);
     Object.assign(store.seenAt, only(j.seenAt)); seasonOpts();
+    if (Array.isArray(j.rec)) store.rec = uniq([...store.rec, ...j.rec.filter(c => ok.has(c))]);
+    Object.assign(store.recAt, only(j.recAt));
     const ed = JSON.parse(JSON.stringify(only(j.edit))); migrate(ed);
     Object.assign(store.memo, only(j.memo)); Object.assign(store.edit, ed);
     MF.forEach(([k]) => { const o = j.opt && j.opt[k]; if (o && typeof o === "object")
@@ -783,11 +793,13 @@ $("bkFile").addEventListener("change", async e => {
 });
 $("csvOut").addEventListener("click", () => {
   const q = v => { v = String(v ?? ""); return /[",\n\r]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; };
-  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー（元データ）","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事の具体例","困りごとの具体例","家でできる実験・工作","登場キャラクター","カテゴリー（学びの目的）","季節・行事","生活の困りごと","Prime Video話数","修正あり","メモ","見た","見た日","お気に入り"];
+  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー（元データ）","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事の具体例","困りごとの具体例","家でできる実験・工作","登場キャラクター","カテゴリー（学びの目的）","季節・行事","生活の困りごと","Prime Video話数","修正あり","メモ","見た","見た日","お気に入り","録画","録画日","英語音声"];
   const rows = D.map(d => { const L = f => labs(f, d.V[f]).join("、");
     return [d.k, d.s, d.c, `${d.j} / ${d.e}`, labs("butai", d.V.butai).join("・"), ORIG[d.c].g, d.t, L("age"), d.y, L("country"), d.m, d.p, d.h, L("chr"),
       L("cat"), L("sea"), L("kom"), pvNum(d), d.mod ? "○" : "", d.memo,
-      store.seen.includes(d.c) ? "○" : "", store.seenAt[d.c] ? new Date(store.seenAt[d.c]).toLocaleDateString("ja-JP") : "", store.fav.includes(d.c) ? "○" : ""]; });
+      store.seen.includes(d.c) ? "○" : "", store.seenAt[d.c] ? new Date(store.seenAt[d.c]).toLocaleDateString("ja-JP") : "", store.fav.includes(d.c) ? "○" : "",
+      store.rec.includes(d.c) ? "○" : "", store.recAt[d.c] ? new Date(store.recAt[d.c]).toLocaleDateString("ja-JP") : "",
+      EN_PRIME.has(d.s) ? "Prime Video" + (store.rec.includes(d.c) ? "・録画" : "") : store.rec.includes(d.c) ? "録画" : ""]; });
   download(`osaru_george_${today()}.csv`, "﻿" + [head, ...rows].map(r => r.map(q).join(",")).join("\r\n"), "text/csv");
   flash("CSVを書き出しました");
 });
