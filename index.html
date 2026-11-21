@@ -52,7 +52,7 @@ h2 small{font-size:14px;font-weight:500;color:var(--sub);margin-left:8px}
 .chip[aria-pressed=true]{background:var(--fur);border-color:var(--fur);color:#fff}
 .chip span{white-space:nowrap;font-size:12px;opacity:.75;margin-left:4px}
 .row{display:grid;grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+label.f,div.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
 input[type=search],select{min-height:46px;font:inherit;font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
 .toggles{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--fur);outline-offset:2px}
@@ -91,7 +91,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .badge{font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--fur);color:#fff}
 dialog{width:min(640px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:0;border:none;border-radius:18px;background:var(--bg);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.35)}
 dialog::backdrop{background:rgba(30,18,8,.55)}
-dialog form{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+dialog form,dialog .dwrap{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
 .dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .dh h2{margin:0;font-size:18px;flex:1;line-height:1.35}
 .db{overflow:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px}
@@ -103,17 +103,49 @@ dialog form{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
 .db h3{margin:8px 0 0;font-size:15px}
 .db .hint{margin:0;font-size:13px;color:var(--sub)}
 .db label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
-.db label.mod{color:var(--fur);font-weight:700}
 .db input,.db textarea,.db select{font:inherit;font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);min-height:46px}
 .db textarea{min-height:90px;resize:vertical}
 .db #mMemo{min-height:110px}
-.pchk{display:flex;flex-wrap:wrap;gap:6px}
-.pchk label{flex-direction:row;align-items:center;gap:6px;padding:6px 10px;border:1.5px solid var(--line);border-radius:999px;font-size:14px;color:var(--ink);min-height:40px}
-.pchk input{min-height:0;width:18px;height:18px;margin:0;accent-color:var(--fur)}
 .x{min-width:44px;min-height:44px;border:none;background:transparent;color:var(--ink);font-size:24px;cursor:pointer;border-radius:10px}
 .manage{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .manage .btn{font-size:14px}
 .msg{min-height:1.6em;margin:6px 0 0;color:var(--fur);font-weight:700}
+.db label.mod,.fld.mod .fl{color:var(--fur);font-weight:700}
+.fields{display:flex;flex-direction:column;gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fl{font-size:13px;color:var(--sub)}
+.fl small{font-size:12px;font-weight:400;margin-left:4px}
+.sec{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.sec h3{margin:0;flex:1}
+.lnk{min-height:44px;padding:4px 6px;border:none;background:transparent;color:var(--fur);font:inherit;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer}
+.lnk:disabled{opacity:.4;text-decoration:none;cursor:default}
+.ms{position:relative;min-width:0}
+.ms-btn{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:16px;text-align:left;cursor:pointer}
+.ms.open .ms-btn{border-color:var(--fur)}
+.ms-val{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-val.none{color:var(--sub)}
+.ms-car{color:var(--sub);font-size:12px}
+.ms-pop{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);min-width:260px;padding:8px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);box-shadow:0 8px 24px rgba(40,24,10,.22)}
+.db .ms-pop{position:static;margin-top:4px;box-shadow:none;min-width:0}
+.ms-q{width:100%;box-sizing:border-box;min-height:42px;margin-bottom:6px;font:inherit;font-size:16px;padding:6px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.ms-list{display:flex;flex-direction:column;max-height:min(46vh,320px);overflow:auto}
+.db .ms-list{max-height:260px}
+.ms-opt{display:flex!important;flex-direction:row!important;align-items:center;gap:10px;min-height:44px;padding:4px 8px;border-radius:8px;font-size:15px!important;color:var(--ink)!important;cursor:pointer}
+.ms-opt:hover{background:var(--chip)}
+.ms-opt input{width:20px;height:20px;min-height:0!important;margin:0;padding:0;accent-color:var(--fur);flex:none}
+.ms-opt:has(input:checked){background:var(--soft);font-weight:700}
+.ms-foot{display:flex;align-items:center;gap:8px;padding-top:6px;border-top:1px solid var(--line);margin-top:6px}
+.ms-foot .sp{flex:1}
+.ms-foot .btn{min-height:40px;padding:6px 18px}
+.madd{display:flex;gap:8px}
+.madd input{flex:1;min-width:0}
+.mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mlist li{display:flex;align-items:center;gap:8px}
+.mlist li input{flex:1;min-width:0}
+.mlist .cnt{font-size:13px;color:var(--sub);white-space:nowrap;min-width:3.5em;text-align:right}
+.mlist .del{min-height:44px;padding:4px 12px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.mlist .del.arm{background:#b3261e;border-color:#b3261e;color:#fff;font-weight:700}
+.row .f .ms{width:100%}
 .empty{grid-column:1/-1;text-align:center;padding:48px 16px;color:var(--sub)}
 footer{border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
 footer .wrap{padding-block:18px 28px}
@@ -137,8 +169,8 @@ footer .wrap{padding-block:18px 28px}
 
 <div class="row">
 <label class="f q">ことばで探す<input type="search" id="q" placeholder="例：磁石、時計、ハロウィン、恐竜" autocomplete="off"></label>
-<label class="f">対象年齢<select id="age"><option value="">すべて</option><option value="3">3歳から見られる話</option><option value="4">4歳以上向けの話</option></select></label>
-<label class="f">キャラクター<select id="chr"><option value="">すべて</option></select></label>
+<label class="f">対象年齢<select id="age"></select></label>
+<div class="f"><span id="chrLab">キャラクター</span><div class="ms" id="chrF"></div></div>
 <label class="f">シーズン<select id="ssn"><option value="">すべて</option></select></label>
 </div>
 <div class="toggles">
@@ -159,29 +191,48 @@ footer .wrap{padding-block:18px 28px}
 
 <div class="wrap"><div class="results" id="results"></div></div>
 </main>
+
 <dialog id="dlg" aria-labelledby="dTitle">
 <form method="dialog" id="dForm">
 <div class="dh"><h2 id="dTitle"></h2><button type="button" class="x" id="dX" aria-label="閉じる">×</button></div>
 <div class="db">
 <label>メモ（気づいたこと、子どもの反応など）<textarea id="mMemo" placeholder="例：恐竜好きの娘が夢中で見ていた。見たあと公園で化石さがし。"></textarea></label>
-<h3>話の内容を修正</h3>
-<p class="hint">変えた項目は茶色の文字になります。検索や分類にもすぐ反映されます。</p>
-<div id="dFields" style="display:flex;flex-direction:column;gap:12px"></div>
-<label id="pLab">学びの目的（自動で付いた分類を変えられます）</label>
-<div class="pchk" id="dPur"></div>
+<div class="sec"><h3>話の内容を修正</h3><button type="button" class="lnk" id="dMgr">選択肢を管理する</button></div>
+<p class="hint">変えた項目は茶色の文字になります。検索や絞り込みにもすぐ反映されます。</p>
+<div id="dFields" class="fields"></div>
 </div>
 <div class="df">
-<button type="button" class="btn ghost" id="dReset">修正を戻す</button>
+<button type="button" class="lnk" id="dReset">修正を戻す</button>
 <span class="sp"></span>
 <button type="button" class="btn ghost" id="dCancel">やめる</button>
 <button type="submit" class="btn" id="dSave">保存する</button>
 </div>
 </form>
 </dialog>
+
+<dialog id="mgr" aria-labelledby="mTitle">
+<div class="dwrap">
+<div class="dh"><h2 id="mTitle">選択肢の管理</h2><button type="button" class="x" id="mX" aria-label="閉じる">×</button></div>
+<div class="db">
+<label>どの項目の選択肢？<select id="mField"></select></label>
+<p class="hint">名前を書きかえると、その選択肢が付いている話すべてに反映されます。削除すると、付いていた話からも外れます。</p>
+<form class="madd" id="mAddForm"><input id="mNew" placeholder="新しい選択肢の名前" autocomplete="off" aria-label="新しい選択肢の名前"><button class="btn" type="submit">追加</button></form>
+<p class="msg" id="mMsg" role="status"></p>
+<ul class="mlist" id="mList"></ul>
+</div>
+<div class="df">
+<button type="button" class="lnk" id="mResetF">この項目を最初の状態に戻す</button>
+<span class="sp"></span>
+<button type="button" class="btn" id="mDone">閉じる</button>
+</div>
+</div>
+</dialog>
+
 <footer><div class="wrap">
 <h3 style="margin:0;font-size:16px;color:var(--ink)">メモ・修正のデータ</h3>
-<p style="margin:4px 0 0">メモや修正はこの端末のブラウザにだけ保存されます。機種変更や別の端末で使うときは、バックアップを書き出して読み込んでください。<span id="stat"></span></p>
+<p style="margin:4px 0 0">メモ・修正・選択肢はこの端末のブラウザにだけ保存されます。機種変更や別の端末で使うときは、バックアップを書き出して読み込んでください。<span id="stat"></span></p>
 <div class="manage">
+<button class="btn ghost" id="mgrOpen">選択肢の管理</button>
 <button class="btn ghost" id="bkOut">バックアップを書き出す</button>
 <button class="btn ghost" id="bkIn">バックアップを読み込む</button>
 <button class="btn ghost" id="csvOut">修正を反映したCSVを書き出す</button>
@@ -189,7 +240,7 @@ footer .wrap{padding-block:18px 28px}
 </div>
 <p class="msg" id="msg" role="status"></p>
 <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
-回は日本語版の通算回、話数はシーズン内の番号です。あらすじと分類（学びの分野・困りごと・季節・家でできること）は公開情報をもとにした独自のまとめで、公式の分類ではありません。「見た」「お気に入り」はこの端末のブラウザにだけ保存されます。</div></footer>
+回は日本語版の通算回、話数はシーズン内の番号です。あらすじと分類（学びの目的・困りごと・季節・家でできること）は公開情報をもとにした独自のまとめで、公式の分類ではありません。</div></footer>
 
 <script>
 {
@@ -235,78 +286,180 @@ const S = [
  ["行事",/ハロウィン|バレンタイン|母の日|父の日|春節|大みそか|うるう|アースデイ|グラウンドホッグ|結婚式|記念日|エッグ/],
  ["夜・星空",/夜空|流星群/],["お祭り・おでかけ",/お祭り|パレード|遊園地|まつり|キャンプ/],["海",/海/]
 ];
-const F = [["j","邦題"],["e","原題"],["b","舞台"],["g","教育カテゴリー"],["t","具体的テーマ・学び"],["a","対象年齢目安","sel",["3歳〜","4歳〜"]],
- ["y","あらすじ","area"],["n","国・地域"],["m","季節・行事"],["p","生活の困りごと"],["h","家でできる実験・工作"],["r","登場キャラクター（「、」で区切る）"],
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uniq = a => [...new Set(a)];
+
+// ---------- 選択式の項目と、最初の選択肢 ----------
+const MF = [ // [key, 名前, 1つだけ選ぶ]
+ ["cat","カテゴリー（学びの目的）"],["age","対象年齢",true],["butai","舞台"],["country","国・地域"],
+ ["sea","季節・行事"],["kom","生活の困りごと"],["chr","登場キャラクター"]];
+const MFN = Object.fromEntries(MF.map(f => [f[0], f[1]]));
+const TF = [ // 文字で入力する項目
+ ["j","邦題"],["e","原題"],["t","具体的テーマ・学び"],["y","あらすじ","area"],
+ ["p","こんなときに（困りごとの具体例）"],["m","季節・行事の具体例"],["h","家でできる実験・工作"],
  ["pv","Prime Videoでのシーズン内の話数（ずれていたら直す）","num"]];
-const ORIG = {}; D.forEach(d => { ORIG[d.c] = {}; F.forEach(f => ORIG[d.c][f[0]] = d[f[0]] ?? ""); });
+const splitR = r => (r || "").split(/[、,，]\s*/).map(x => x.trim()).filter(Boolean);
+const splitB = b => b && b !== "不明" ? b.split("・").map(x => x.trim()).filter(Boolean) : [];
+const byFreq = arr => { const c = {}; arr.forEach(x => c[x] = (c[x] || 0) + 1); return Object.keys(c).sort((a,b) => c[b] - c[a]); };
 const autoP = d => P.filter(p => p[2].test(d.g + " " + d.t) || (p[0]==="sekai" && d.n)).map(p => p[0]);
-let store = {seen:[], fav:[], memo:{}, edit:{}};
+const ORIG = {}, BASE = {};
+D.forEach(d => {
+  ORIG[d.c] = {}; TF.forEach(f => ORIG[d.c][f[0]] = d[f[0]] ?? ""); ORIG[d.c].g = d.g;
+  BASE[d.c] = { cat:autoP(d), age:d.a ? [d.a] : [], butai:splitB(d.b), country:d.n ? [d.n] : [],
+    sea:S.filter(s => d.m && s[1].test(d.m)).map(s => s[0]), kom:K.filter(k => d.p && k[1].test(d.p)).map(k => k[0]), chr:splitR(d.r) };
+});
+const mk = ids => ids.map(x => ({id:x, label:x}));
+const DEF = {
+  cat: P.map(p => ({id:p[0], label:p[1]})),
+  age: mk(["3歳〜","4歳〜"]),
+  butai: mk(byFreq(D.flatMap(d => BASE[d.c].butai))),
+  country: mk(byFreq(D.flatMap(d => BASE[d.c].country))),
+  sea: mk(S.map(s => s[0])), kom: mk(K.map(k => k[0])),
+  chr: mk(byFreq(D.flatMap(d => BASE[d.c].chr)))
+};
+
+// ---------- 保存データ ----------
+let store = {seen:[], fav:[], memo:{}, edit:{}, opt:{}};
 try { store = Object.assign(store, JSON.parse(localStorage.getItem("georgeLearn.v1") || "{}")); } catch(e) {}
 const save = () => { try { localStorage.setItem("georgeLearn.v1", JSON.stringify(store)); return true; } catch(e) { return false; } };
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e) {}
+function migrate(edit) { // 前の版（文字入力）の修正を選択式に移す
+  Object.values(edit || {}).forEach(ed => {
+    if (typeof ed.b === "string") { ed.butai = splitB(ed.b); delete ed.b; }
+    if (typeof ed.n === "string") { ed.country = ed.n ? [ed.n] : []; delete ed.n; }
+    if (typeof ed.r === "string") { ed.chr = splitR(ed.r); delete ed.r; }
+    if (typeof ed.a === "string") { ed.age = ed.a ? [ed.a] : []; delete ed.a; }
+    if (Array.isArray(ed.P)) { ed.cat = ed.P; delete ed.P; }
+  });
+}
+migrate(store.edit);
+
+// ---------- 選択肢（最初の選択肢＋追加・名前変更・削除） ----------
+let OPTS = {}, LAB = {};
+function refreshOpts() {
+  MF.forEach(([f]) => {
+    const o = store.opt[f] || {}, del = new Set(o.del || []), ren = o.ren || {};
+    OPTS[f] = [...DEF[f], ...(o.add || [])].filter(x => !del.has(x.id)).map(x => ({id:x.id, label:ren[x.id] || x.label}));
+    LAB[f] = Object.fromEntries(OPTS[f].map(x => [x.id, x.label]));
+  });
+}
+refreshOpts();
+const labs = (f, ids) => ids.map(id => LAB[f][id]).filter(Boolean);
+const valid = (f, ids) => (ids || []).filter(id => id in LAB[f]);
+
 function derive(d) {
-  Object.assign(d, ORIG[d.c]);
   const ed = store.edit[d.c] || {};
-  F.forEach(f => { if (f[0] in ed) d[f[0]] = ed[f[0]]; });
-  d.P = Array.isArray(ed.P) ? ed.P.slice() : autoP(d);
-  d.K = K.filter(k => d.p && k[1].test(d.p)).map(k => k[0]);
-  d.S = S.filter(s => d.m && s[1].test(d.m)).map(s => s[0]);
-  d.R = d.r ? d.r.split(/[、,，]\s*/).map(x => x.trim()).filter(Boolean) : [];
+  TF.forEach(([k]) => d[k] = k in ed ? ed[k] : ORIG[d.c][k]);
+  d.V = {}; MF.forEach(([f]) => d.V[f] = valid(f, Array.isArray(ed[f]) ? ed[f] : BASE[d.c][f]));
   d.memo = store.memo[d.c] || "";
   d.mod = Object.keys(ed).length > 0;
-  d.txt = [d.j,d.e,d.g,d.t,d.y,d.n,d.m,d.p,d.h,d.r,d.b,d.memo].join(" ").toLowerCase();
+  d.txt = [d.j,d.e,d.t,d.y,d.m,d.p,d.h,ORIG[d.c].g,d.memo, ...MF.flatMap(([f]) => labs(f, d.V[f]))].join(" ").toLowerCase();
 }
-D.forEach(derive);
-const st = {pur:new Set(), kom:new Set(), sea:new Set(), q:"", age:"", chr:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false, sort:"ep"};
-const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const deriveAll = () => D.forEach(derive);
+deriveAll();
+const FIRST = {}; D.forEach(d => { if (!(d.s in FIRST) || d.k < FIRST[d.s]) FIRST[d.s] = d.k; });
+const pvNum = d => d.pv !== "" && d.pv != null ? d.pv : d.k - FIRST[d.s] + 1;
 
-function fillChars() {
-  const chars = [...new Set(D.flatMap(d => d.R))];
-  const freq = c => D.filter(d => d.R.includes(c)).length;
-  chars.sort((a,b) => freq(b) - freq(a));
-  if (st.chr && !chars.includes(st.chr)) st.chr = "";
-  $("chr").innerHTML = `<option value="">すべて</option>` + chars.map(c => `<option${c===st.chr?" selected":""}>${esc(c)}</option>`).join("");
+// ---------- プルダウン（複数選択） ----------
+// el: 入れ物, opts: {field, sel:Set, single, empty, onChange}
+function ms(el, o) {
+  el._o = o;
+  const id = el.id || ("ms" + Math.random().toString(36).slice(2, 8));
+  const many = OPTS[o.field].length > 8;
+  el.innerHTML = `<button type="button" class="ms-btn" aria-haspopup="true" aria-expanded="false" aria-controls="${id}-p" aria-labelledby="${o.lbl||""} ${id}-v"><span class="ms-val" id="${id}-v"></span><span class="ms-car" aria-hidden="true">▾</span></button>
+<div class="ms-pop" id="${id}-p" hidden>
+${many ? `<input type="search" class="ms-q" placeholder="しぼりこむ" aria-label="${esc(MFN[o.field])}をしぼりこむ" autocomplete="off">` : ""}
+<div class="ms-list" role="group" aria-label="${esc(MFN[o.field])}">${OPTS[o.field].map(x =>
+  `<label class="ms-opt"><input type="${o.single?"radio":"checkbox"}" name="${id}-r" value="${esc(x.id)}"${o.sel.has(x.id)?" checked":""}><span>${esc(x.label)}</span></label>`).join("") || `<p class="hint">選択肢がありません。「選択肢を管理する」から追加できます。</p>`}</div>
+<div class="ms-foot"><button type="button" class="lnk ms-clear">選択をはずす</button><span class="sp"></span><button type="button" class="btn ms-done">決定</button></div>
+</div>`;
+  msText(el);
 }
-fillChars();
+function msText(el) {
+  const o = el._o, l = labs(o.field, [...o.sel]);
+  el.querySelector(".ms-val").textContent = l.length ? l.join("、") : o.empty;
+  el.querySelector(".ms-val").classList.toggle("none", !l.length);
+}
+function msOpen(el, open) {
+  const pop = el.querySelector(".ms-pop"), btn = el.querySelector(".ms-btn");
+  pop.hidden = !open; btn.setAttribute("aria-expanded", open); el.classList.toggle("open", open);
+  if (open && !el.closest("dialog")) { // 画面の右端からはみ出さないように
+    pop.style.left = ""; pop.style.right = ""; pop.style.maxWidth = (innerWidth - 16) + "px";
+    const r = pop.getBoundingClientRect();
+    if (r.right > innerWidth - 8) { pop.style.left = "auto"; pop.style.right = "0"; }
+  }
+  if (open) { const q = el.querySelector(".ms-q"); if (q) { q.value = ""; msFilter(el, ""); }
+    (q || el.querySelector(".ms-opt input"))?.focus({preventScroll:true}); }
+}
+function msFilter(el, q) { q = q.toLowerCase(); el.querySelectorAll(".ms-opt").forEach(l => l.hidden = q && !l.textContent.toLowerCase().includes(q)); }
+const closeAllMs = except => document.querySelectorAll(".ms.open").forEach(m => m !== except && msOpen(m, false));
+document.addEventListener("click", e => {
+  const m = e.target.closest(".ms");
+  closeAllMs(m);
+  if (!m) return;
+  if (e.target.closest(".ms-btn")) { msOpen(m, !m.classList.contains("open")); return; }
+  if (e.target.closest(".ms-done")) { msOpen(m, false); m.querySelector(".ms-btn").focus(); return; }
+  if (e.target.closest(".ms-clear")) { m._o.sel.clear(); m.querySelectorAll(".ms-opt input").forEach(i => i.checked = false); msText(m); m._o.onChange && m._o.onChange(); }
+});
+document.addEventListener("change", e => {
+  const m = e.target.closest(".ms"); if (!m || !e.target.matches(".ms-opt input")) return;
+  const o = m._o, v = e.target.value;
+  if (o.single) { o.sel.clear(); o.sel.add(v); } else e.target.checked ? o.sel.add(v) : o.sel.delete(v);
+  msText(m); o.onChange && o.onChange();
+});
+document.addEventListener("input", e => { if (e.target.matches(".ms-q")) msFilter(e.target.closest(".ms"), e.target.value); });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  const m = document.querySelector(".ms.open");
+  if (m) { e.preventDefault(); e.stopPropagation(); msOpen(m, false); m.querySelector(".ms-btn").focus(); }
+}, true);
+
+// ---------- 検索画面 ----------
+const st = {pur:new Set(), kom:new Set(), sea:new Set(), chr:new Set(), q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false, sort:"ep"};
+function buildFilters() {
+  ["pur","kom","sea","chr"].forEach(k => { const f = k==="pur" ? "cat" : k; [...st[k]].forEach(v => { if (!(v in LAB[f])) st[k].delete(v); }); });
+  if (st.age && !(st.age in LAB.age)) st.age = "";
+  $("age").innerHTML = `<option value="">すべて</option>` + OPTS.age.map(x => `<option value="${esc(x.id)}"${x.id===st.age?" selected":""}>${esc(x.label)}</option>`).join("");
+  ms($("chrF"), {field:"chr", sel:st.chr, empty:"すべて", lbl:"chrLab", onChange:render});
+}
 $("ssn").innerHTML += [...Array(15)].map((_,i) => `<option value="${i+1}">シーズン${i+1}</option>`).join("");
 
 function match(d, skip) {
-  if (skip!=="pur" && st.pur.size && !d.P.some(p => st.pur.has(p))) return false;
-  if (skip!=="kom" && st.kom.size && !d.K.some(k => st.kom.has(k))) return false;
-  if (skip!=="sea" && st.sea.size && !d.S.some(s => st.sea.has(s))) return false;
+  if (skip!=="pur" && st.pur.size && !d.V.cat.some(p => st.pur.has(p))) return false;
+  if (skip!=="kom" && st.kom.size && !d.V.kom.some(k => st.kom.has(k))) return false;
+  if (skip!=="sea" && st.sea.size && !d.V.sea.some(s => st.sea.has(s))) return false;
+  if (st.chr.size && !d.V.chr.some(c => st.chr.has(c))) return false;
   if (st.q) { const ws = st.q.toLowerCase().split(/\s+/).filter(Boolean); if (!ws.every(w => d.txt.includes(w))) return false; }
-  if (st.age==="3" && d.a!=="3歳〜") return false;
-  if (st.age==="4" && d.a!=="4歳〜") return false;
-  if (st.chr && !d.R.includes(st.chr)) return false;
+  if (st.age && !d.V.age.includes(st.age)) return false;
   if (st.ssn && String(d.s)!==st.ssn) return false;
   if (st.home && !d.h) return false;
-  if (st.world && !d.n) return false;
+  if (st.world && !d.V.country.length) return false;
   if (st.unseen && store.seen.includes(d.c)) return false;
   if (st.fav && !store.fav.includes(d.c)) return false;
   if (st.memo && !d.memo && !d.mod) return false;
   return true;
 }
-function chipsHTML(list, set, key, sel) {
-  return list.map(x => { const id = x[0], lab = key==="pur" ? x[1] : x[0];
-    const n = D.filter(d => match(d, key) && sel(d).includes(id)).length;
-    return `<button class="${key==="pur"?"pur":"chip"}" data-k="${key}" data-v="${id}" aria-pressed="${set.has(id)}" ${n||set.has(id)?"":"disabled"}>${esc(lab)}<span>${n}話</span></button>`; }).join("");
+function chipsHTML(key, field) {
+  const set = st[key];
+  return OPTS[field].map(x => {
+    const n = D.filter(d => match(d, key) && d.V[field].includes(x.id)).length;
+    return `<button class="${key==="pur"?"pur":"chip"}" data-k="${key}" data-v="${esc(x.id)}" aria-pressed="${set.has(x.id)}" ${n||set.has(x.id)?"":"disabled"}>${esc(x.label)}<span>${n}話</span></button>`; }).join("");
 }
-const PV = ["B0CN5RFXMX", "B0CWDZ2XK6", "B0CZZL611T", "B0D33T73CT", "B0CXQ77H5P", "B0CTWM2XL4", "B0CWP22GMJ", "B0CV36Z2TH", "B0D2WDM4GW", "B0D2WDVG1S", "B0D33SM2TM", "B0D1WP2HC3", "B0CYPR3WHD", "B0CYGQ62P2", "B0GWKST9WK"];
-const FIRST = {}; D.forEach(d => { if (!(d.s in FIRST) || d.k < FIRST[d.s]) FIRST[d.s] = d.k; });
-function pv(d) { const n = d.pv !== "" && d.pv != null ? d.pv : d.k - FIRST[d.s] + 1;
-  return `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${esc(n)}話</small></a>`; }
+const PV = ["B0CN5RFXMX","B0CWDZ2XK6","B0CZZL611T","B0D33T73CT","B0CXQ77H5P","B0CTWM2XL4","B0CWP22GMJ","B0CV36Z2TH","B0D2WDM4GW","B0D2WDVG1S","B0D33SM2TM","B0D1WP2HC3","B0CYPR3WHD","B0CYGQ62P2","B0GWKST9WK"];
+const pv = d => `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${esc(pvNum(d))}話</small></a>`;
 function card(d) {
-  const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c);
-  const pl = P.filter(p => d.P.includes(p[0])).map(p => `<span class="tag">${p[1]}</span>`).join("");
+  const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c), V = d.V;
+  const tags = [...labs("cat", V.cat), ...labs("sea", V.sea), ...labs("country", V.country)].map(t => `<span class="tag">${esc(t)}</span>`).join("");
+  const kom = labs("kom", V.kom).join("、"), chr = labs("chr", V.chr).join("、"), but = labs("butai", V.butai).join("・");
   return `<article class="card" id="c-${d.c}">
-<div class="meta"><b>${d.c}</b><span>第${d.k}回</span><span>${esc(d.a)}</span><span>${esc(d.b)}</span>${d.mod?`<span class="badge">修正あり</span>`:""}</div>
+<div class="meta"><b>${d.c}</b><span>第${d.k}回</span>${labs("age", V.age).map(a => `<span>${esc(a)}</span>`).join("")}${but?`<span>${esc(but)}</span>`:""}${d.mod?`<span class="badge">修正あり</span>`:""}</div>
 <h3>${esc(d.j)}</h3><div class="en">${esc(d.e)}</div>
 <p class="theme">${esc(d.t)}</p><p class="syn">${esc(d.y)}</p>
-<div class="tags">${pl}${d.m?`<span class="tag">${esc(d.m)}</span>`:""}${d.n?`<span class="tag">${esc(d.n)}</span>`:""}</div>
-${d.p?`<p class="note"><b>こんなときに</b>${esc(d.p)}</p>`:""}
+${tags?`<div class="tags">${tags}</div>`:""}
+${d.p||kom?`<p class="note"><b>こんなときに</b>${esc(d.p || kom)}</p>`:""}
 ${d.h?`<p class="note"><b>見たあとに</b>${esc(d.h)}</p>`:""}
-${d.r?`<div class="meta">登場：${esc(d.r)}</div>`:""}
+${chr?`<div class="meta">登場：${esc(chr)}</div>`:""}
 ${d.memo?`<p class="memo"><b>メモ</b>${esc(d.memo)}</p>`:""}
 ${pv(d)}
 <div class="act"><button data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
@@ -314,9 +467,9 @@ ${pv(d)}
 }
 let shown = [];
 function render() {
-  $("purposes").innerHTML = chipsHTML(P, st.pur, "pur", d => d.P);
-  $("komari").innerHTML = chipsHTML(K, st.kom, "kom", d => d.K);
-  $("season").innerHTML = chipsHTML(S, st.sea, "sea", d => d.S);
+  $("purposes").innerHTML = chipsHTML("pur", "cat");
+  $("komari").innerHTML = chipsHTML("kom", "kom");
+  $("season").innerHTML = chipsHTML("sea", "sea");
   shown = D.filter(d => match(d));
   if (st.sort==="new") shown.reverse();
   if (st.sort==="rnd") shown.sort(() => Math.random() - .5);
@@ -326,12 +479,11 @@ function render() {
   $("pick").disabled = !shown.length;
 }
 document.addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.k) { const set = {pur:st.pur, kom:st.kom, sea:st.sea}[b.dataset.k];
-    set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v); render(); return; }
+  const b = e.target.closest("button"); if (!b || b.closest(".ms")) return;
+  if (b.dataset.k) { const set = st[b.dataset.k]; set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v); render(); return; }
   if (b.dataset.edit) { openEdit(b.dataset.edit); return; }
   if (b.dataset.a) { const arr = store[b.dataset.a], c = b.dataset.c, i = arr.indexOf(c);
-    i < 0 ? arr.push(c) : arr.splice(i, 1); save();
+    i < 0 ? arr.push(c) : arr.splice(i, 1); save(); stat();
     const on = i < 0; b.setAttribute("aria-pressed", on);
     b.textContent = b.dataset.a==="seen" ? (on?"見た":"見たら押す") : (on?"お気に入り済み":"お気に入り");
     if (st.unseen || st.fav) render(); return; }
@@ -339,7 +491,7 @@ document.addEventListener("click", e => {
 const tg = (id, key) => $(id).addEventListener("click", () => { st[key] = !st[key]; $(id).setAttribute("aria-pressed", st[key]); render(); });
 tg("tHome","home"); tg("tWorld","world"); tg("tUnseen","unseen"); tg("tFav","fav"); tg("tMemo","memo");
 let tmr; $("q").addEventListener("input", e => { clearTimeout(tmr); tmr = setTimeout(() => { st.q = e.target.value.trim(); render(); }, 150); });
-["age","chr","ssn","sort"].forEach(id => $(id).addEventListener("change", e => { st[id] = e.target.value; render(); }));
+["age","ssn","sort"].forEach(id => $(id).addEventListener("change", e => { st[id] = e.target.value; render(); }));
 $("pick").addEventListener("click", () => {
   if (!shown.length) return;
   const d = shown[Math.floor(Math.random() * shown.length)], el = $("c-" + d.c);
@@ -347,39 +499,52 @@ $("pick").addEventListener("click", () => {
   if (el) { el.classList.add("hl"); el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center"}); }
 });
 $("clear").addEventListener("click", () => {
-  st.pur.clear(); st.kom.clear(); st.sea.clear(); Object.assign(st, {q:"", age:"", chr:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false});
-  $("q").value = ""; ["age","chr","ssn"].forEach(id => $(id).value = "");
+  ["pur","kom","sea","chr"].forEach(k => st[k].clear());
+  Object.assign(st, {q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false});
+  $("q").value = ""; ["age","ssn"].forEach(id => $(id).value = ""); msText($("chrF"));
   ["tHome","tWorld","tUnseen","tFav","tMemo"].forEach(id => $(id).setAttribute("aria-pressed", "false")); render();
 });
-// ---- メモ・修正
-const dlg = $("dlg"); let cur = null, opener = null;
+
+// ---------- メモ・修正の画面 ----------
+const dlg = $("dlg"); let cur = null, opener = null, dsel = {};
 const byC = c => D.find(d => d.c === c);
-function fieldHTML(f, d) {
-  const [k, lab, type, opts] = f, v = d[k] ?? "", mod = store.edit[d.c] && k in store.edit[d.c];
-  const ph = k==="pv" ? `placeholder="${d.k - FIRST[d.s] + 1}"` : `placeholder="${esc(ORIG[d.c][k] || "")}"`;
-  let inp;
-  if (type==="area") inp = `<textarea data-f="${k}">${esc(v)}</textarea>`;
-  else if (type==="sel") inp = `<select data-f="${k}">${opts.map(o => `<option${o===v?" selected":""}>${o}</option>`).join("")}</select>`;
-  else if (type==="num") inp = `<input type="number" inputmode="numeric" min="1" max="40" data-f="${k}" value="${esc(v)}" ${ph}>`;
-  else inp = `<input type="text" data-f="${k}" value="${esc(v)}" ${ph}>`;
-  return `<label class="${mod?"mod":""}">${lab}${inp}</label>`;
+const same = (a, b) => [...a].sort().join("\u0001") === [...b].sort().join("\u0001");
+function fieldsHTML(d) {
+  const ed = store.edit[d.c] || {};
+  const txt = f => {
+    const [k, lab, type] = f, v = d[k] ?? "", mod = k in ed;
+    const ph = k==="pv" ? `placeholder="${d.k - FIRST[d.s] + 1}"` : "";
+    const inp = type==="area" ? `<textarea data-f="${k}">${esc(v)}</textarea>`
+      : type==="num" ? `<input type="number" inputmode="numeric" min="1" max="40" data-f="${k}" value="${esc(v)}" ${ph}>`
+      : `<input type="text" data-f="${k}" value="${esc(v)}">`;
+    return `<label class="${mod?"mod":""}">${lab}${inp}</label>`;
+  };
+  const sel = ([f, lab, single]) => `<div class="fld${Array.isArray(ed[f]) && !same(valid(f, ed[f]), valid(f, BASE[d.c][f])) ? " mod" : ""}" data-mf="${f}"><span class="fl" id="fl-${f}">${lab}${single?"":"<small>（いくつでも）</small>"}</span><div class="ms" id="ms-${f}"></div></div>`;
+  const T = Object.fromEntries(TF.map(f => [f[0], f]));
+  return [txt(T.j), txt(T.e), ...MF.map(sel), txt(T.t), txt(T.y), txt(T.p), txt(T.m), txt(T.h), txt(T.pv)].join("");
+}
+function mountSel() {
+  MF.forEach(([f, , single]) => ms($("ms-" + f), {field:f, sel:dsel[f], single, empty:"未選択", lbl:"fl-" + f, onChange:() => {
+    $("ms-" + f).closest(".fld").classList.toggle("mod", !same(valid(f, [...dsel[f]]), valid(f, BASE[cur.c][f])));
+  }}));
+}
+function fillEdit() {
+  $("dFields").innerHTML = fieldsHTML(cur); mountSel();
+  $("dReset").disabled = !store.edit[cur.c];
 }
 function openEdit(c) {
   cur = byC(c); if (!cur) return; opener = document.activeElement;
+  dsel = Object.fromEntries(MF.map(([f]) => [f, new Set(cur.V[f])]));
   $("dTitle").textContent = `${cur.c}　${cur.j}`;
   $("mMemo").value = store.memo[c] || "";
-  $("dFields").innerHTML = F.map(f => fieldHTML(f, cur)).join("");
-  $("dPur").innerHTML = P.map(p => `<label><input type="checkbox" value="${p[0]}"${cur.P.includes(p[0])?" checked":""}>${p[1]}</label>`).join("");
-  $("pLab").className = store.edit[c] && Array.isArray(store.edit[c].P) ? "mod" : "";
-  $("dReset").disabled = !store.edit[c];
-  dlg.showModal(); $("mMemo").focus();
+  lastMf = null; fillEdit(); dlg.showModal(); $("mMemo").focus();
 }
-function closeEdit() { dlg.close(); if (opener && document.body.contains(opener)) opener.focus(); }
+function closeEdit() { closeAllMs(); dlg.close(); if (opener && document.body.contains(opener)) opener.focus(); }
 $("dX").addEventListener("click", closeEdit); $("dCancel").addEventListener("click", closeEdit);
 dlg.addEventListener("click", e => { if (e.target === dlg) closeEdit(); });
 dlg.addEventListener("input", e => {
   const el = e.target; if (!el.dataset.f) return;
-  const o = String(ORIG[cur.c][el.dataset.f] ?? ""); el.closest("label").className = el.value.trim() !== o ? "mod" : "";
+  el.closest("label").className = el.value.trim() !== String(ORIG[cur.c][el.dataset.f] ?? "") ? "mod" : "";
 });
 $("dForm").addEventListener("submit", e => {
   e.preventDefault(); if (!cur) return;
@@ -388,25 +553,95 @@ $("dForm").addEventListener("submit", e => {
     const k = el.dataset.f, v = el.value.trim(), o = String(ORIG[c][k] ?? "");
     if (v !== o) ed[k] = k==="pv" && v !== "" ? Number(v) : v;
   });
-  const tmp = Object.assign({}, ORIG[c], ed), auto = autoP(tmp).sort().join();
-  const chk = [...dlg.querySelectorAll("#dPur input:checked")].map(x => x.value);
-  if (chk.slice().sort().join() !== auto) ed.P = chk;
+  MF.forEach(([f]) => { const v = valid(f, [...dsel[f]]); if (!same(v, valid(f, BASE[c][f]))) ed[f] = v; });
   memo ? store.memo[c] = memo : delete store.memo[c];
   Object.keys(ed).length ? store.edit[c] = ed : delete store.edit[c];
-  const ok = save(); derive(cur); fillChars(); render(); closeEdit(); stat();
+  const ok = save(); derive(cur); render(); closeEdit(); stat();
   flash(ok ? `${c} を保存しました` : "保存できませんでした（ブラウザの設定でデータの保存が止められている可能性があります）");
   const el = $("c-" + c); if (el) { el.classList.add("hl"); setTimeout(() => el.classList.remove("hl"), 1200); }
 });
 $("dReset").addEventListener("click", () => {
   if (!cur) return; delete store.edit[cur.c]; save(); derive(cur);
-  $("dFields").innerHTML = F.map(f => fieldHTML(f, cur)).join("");
-  $("dPur").innerHTML = P.map(p => `<label><input type="checkbox" value="${p[0]}"${cur.P.includes(p[0])?" checked":""}>${p[1]}</label>`).join("");
-  $("pLab").className = ""; $("dReset").disabled = true; fillChars(); render(); stat();
+  dsel = Object.fromEntries(MF.map(([f]) => [f, new Set(cur.V[f])]));
+  fillEdit(); render(); stat(); $("dSave").focus();
   flash(`${cur.c} の修正を元に戻しました（メモは残っています）`);
 });
+let lastMf = null; dlg.addEventListener("focusin", e => { const f = e.target.closest(".fld"); if (f) lastMf = f.dataset.mf; });
+$("dMgr").addEventListener("click", () => openMgr(lastMf));
+
+// ---------- 選択肢の管理 ----------
+const mgr = $("mgr"); let mOpener = null, armed = null, armTmr;
+$("mField").innerHTML = MF.map(([f, lab]) => `<option value="${f}">${lab}</option>`).join("");
+const optStore = f => store.opt[f] || (store.opt[f] = {add:[], del:[], ren:{}});
+const useCount = (f, id) => D.filter(d => d.V[f].includes(id)).length;
+function mFlash(t) { $("mMsg").textContent = t; }
+function renderMgr() {
+  const f = $("mField").value;
+  $("mList").innerHTML = OPTS[f].map(x => `<li><input value="${esc(x.label)}" data-id="${esc(x.id)}" aria-label="${esc(x.label)}の名前"><span class="cnt">${useCount(f, x.id)}話</span><button type="button" class="del" data-del="${esc(x.id)}">削除</button></li>`).join("")
+    || `<li class="hint">選択肢がありません</li>`;
+  $("mResetF").disabled = !store.opt[f];
+}
+function openMgr(f) {
+  mOpener = document.activeElement; if (f) $("mField").value = f;
+  mFlash(""); renderMgr(); mgr.showModal(); $("mNew").focus();
+}
+function afterOptChange() {
+  save(); refreshOpts(); deriveAll(); buildFilters(); render(); renderMgr(); stat();
+  if (dlg.open && cur) { // 開いている修正画面の選択肢も入れかえる
+    MF.forEach(([f]) => { [...dsel[f]].forEach(v => { if (!(v in LAB[f])) dsel[f].delete(v); }); });
+    const keep = {}; dlg.querySelectorAll("[data-f]").forEach(el => keep[el.dataset.f] = el.value);
+    fillEdit(); dlg.querySelectorAll("[data-f]").forEach(el => { if (el.dataset.f in keep) el.value = keep[el.dataset.f]; });
+  }
+}
+function closeMgr() { mgr.close(); if (mOpener && document.body.contains(mOpener)) mOpener.focus(); }
+$("mX").addEventListener("click", closeMgr); $("mDone").addEventListener("click", closeMgr);
+mgr.addEventListener("click", e => { if (e.target === mgr) closeMgr(); });
+$("mgrOpen").addEventListener("click", () => openMgr());
+$("mField").addEventListener("change", () => { mFlash(""); renderMgr(); });
+$("mAddForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = $("mField").value, name = $("mNew").value.trim(); if (!name) return;
+  if (OPTS[f].some(x => x.label === name)) { mFlash(`「${name}」はもうあります`); return; }
+  const o = optStore(f), gone = [...DEF[f], ...o.add].find(x => x.label === name && o.del.includes(x.id));
+  if (gone) o.del = o.del.filter(id => id !== gone.id); // 削除したものと同じ名前なら復活
+  else o.add.push({id:"u" + Date.now().toString(36), label:name});
+  $("mNew").value = ""; afterOptChange(); mFlash(`「${name}」を追加しました`);
+});
+$("mList").addEventListener("change", e => {
+  const inp = e.target.closest("input[data-id]"); if (!inp) return;
+  const f = $("mField").value, id = inp.dataset.id, name = inp.value.trim(), old = LAB[f][id];
+  if (!name) { inp.value = old; return; }
+  if (name === old) return;
+  if (OPTS[f].some(x => x.label === name && x.id !== id)) { mFlash(`「${name}」はもうあります`); inp.value = old; return; }
+  const o = optStore(f), def = DEF[f].find(x => x.id === id), added = o.add.find(x => x.id === id);
+  if (added) added.label = name; else if (def && def.label === name) delete o.ren[id]; else o.ren[id] = name;
+  afterOptChange(); mFlash(`「${old}」を「${name}」に変えました`);
+});
+$("mList").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.matches("input[data-id]")) { e.preventDefault(); e.target.blur(); } });
+$("mList").addEventListener("click", e => {
+  const b = e.target.closest("[data-del]"); if (!b) return;
+  const f = $("mField").value, id = b.dataset.del, n = useCount(f, id);
+  if (armed !== b) { // 1回目は確認
+    if (armed) { armed.textContent = "削除"; armed.classList.remove("arm"); }
+    armed = b; b.classList.add("arm"); b.textContent = n ? `${n}話から外れます。削除する` : "削除する";
+    clearTimeout(armTmr); armTmr = setTimeout(() => { if (armed === b) { b.textContent = "削除"; b.classList.remove("arm"); armed = null; } }, 5000);
+    return;
+  }
+  armed = null; const name = LAB[f][id], o = optStore(f);
+  if (o.add.some(x => x.id === id)) o.add = o.add.filter(x => x.id !== id); else o.del.push(id);
+  delete o.ren[id];
+  afterOptChange(); mFlash(`「${name}」を削除しました`); $("mNew").focus();
+});
+$("mResetF").addEventListener("click", () => {
+  const f = $("mField").value; delete store.opt[f]; afterOptChange(); mFlash(`${MFN[f]}の選択肢を最初の状態に戻しました`); $("mNew").focus();
+});
+
+// ---------- バックアップ・CSV ----------
 let ft; function flash(t) { $("msg").textContent = t; clearTimeout(ft); ft = setTimeout(() => $("msg").textContent = "", 6000); }
-function stat() { $("stat").textContent = `（いまの記録：メモ ${Object.keys(store.memo).length}話・修正 ${Object.keys(store.edit).length}話・見た ${store.seen.length}話・お気に入り ${store.fav.length}話）`; }
-stat();
+function stat() {
+  const oc = Object.values(store.opt).reduce((n, o) => n + (o.add||[]).length + (o.del||[]).length + Object.keys(o.ren||{}).length, 0);
+  $("stat").textContent = `（いまの記録：メモ ${Object.keys(store.memo).length}話・修正 ${Object.keys(store.edit).length}話・見た ${store.seen.length}話・お気に入り ${store.fav.length}話・選択肢の変更 ${oc}件）`;
+}
 function download(name, text, type) {
   const blob = new Blob([text], {type}), a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
@@ -414,7 +649,7 @@ function download(name, text, type) {
 }
 const today = () => { const t = new Date(); return `${t.getFullYear()}${String(t.getMonth()+1).padStart(2,"0")}${String(t.getDate()).padStart(2,"0")}`; };
 $("bkOut").addEventListener("click", () => {
-  download(`george-backup-${today()}.json`, JSON.stringify(Object.assign({app:"CG-episode-finder", saved:new Date().toISOString()}, store), null, 1), "application/json");
+  download(`george-backup-${today()}.json`, JSON.stringify(Object.assign({app:"CG-episode-finder", ver:2, saved:new Date().toISOString()}, store), null, 1), "application/json");
   flash("バックアップを書き出しました");
 });
 $("bkIn").addEventListener("click", () => $("bkFile").click());
@@ -424,22 +659,27 @@ $("bkFile").addEventListener("change", async e => {
     const j = JSON.parse(await f.text());
     if (!j || typeof j !== "object" || !Array.isArray(j.seen) || !Array.isArray(j.fav)) throw 0;
     const ok = new Set(D.map(d => d.c)), only = o => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ok.has(k)));
-    store.seen = [...new Set([...store.seen, ...j.seen.filter(c => ok.has(c))])];
-    store.fav = [...new Set([...store.fav, ...j.fav.filter(c => ok.has(c))])];
-    Object.assign(store.memo, only(j.memo)); Object.assign(store.edit, only(j.edit));
-    save(); D.forEach(derive); fillChars(); render(); stat();
-    flash(`読み込みました（メモ ${Object.keys(only(j.memo)).length}話・修正 ${Object.keys(only(j.edit)).length}話）`);
+    store.seen = uniq([...store.seen, ...j.seen.filter(c => ok.has(c))]);
+    store.fav = uniq([...store.fav, ...j.fav.filter(c => ok.has(c))]);
+    const ed = JSON.parse(JSON.stringify(only(j.edit))); migrate(ed);
+    Object.assign(store.memo, only(j.memo)); Object.assign(store.edit, ed);
+    MF.forEach(([k]) => { const o = j.opt && j.opt[k]; if (o && typeof o === "object")
+      store.opt[k] = {add:Array.isArray(o.add) ? o.add.filter(x => x && x.id && x.label) : [], del:Array.isArray(o.del) ? o.del : [], ren:o.ren && typeof o.ren === "object" ? o.ren : {}}; });
+    save(); refreshOpts(); deriveAll(); buildFilters(); render(); stat();
+    flash(`読み込みました（メモ ${Object.keys(only(j.memo)).length}話・修正 ${Object.keys(ed).length}話）`);
   } catch(err) { flash("このファイルは読み込めませんでした。書き出したバックアップ（.json）を選んでください"); }
 });
 $("csvOut").addEventListener("click", () => {
   const q = v => { v = String(v ?? ""); return /[",\n\r]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; };
-  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事","生活の困りごと","家でできる実験・工作","登場キャラクター","学びの目的（アプリ）","Prime Video話数","修正あり","メモ"];
-  const rows = D.map(d => [d.k, d.s, d.c, `${d.j} / ${d.e}`, d.b, d.g, d.t, d.a, d.y, d.n, d.m, d.p, d.h, d.r,
-    d.P.map(id => P.find(p => p[0]===id)[1]).join("、"), d.pv !== "" && d.pv != null ? d.pv : d.k - FIRST[d.s] + 1, d.mod ? "○" : "", d.memo]);
+  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー（元データ）","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事の具体例","困りごとの具体例","家でできる実験・工作","登場キャラクター","カテゴリー（学びの目的）","季節・行事","生活の困りごと","Prime Video話数","修正あり","メモ"];
+  const rows = D.map(d => { const L = f => labs(f, d.V[f]).join("、");
+    return [d.k, d.s, d.c, `${d.j} / ${d.e}`, labs("butai", d.V.butai).join("・"), ORIG[d.c].g, d.t, L("age"), d.y, L("country"), d.m, d.p, d.h, L("chr"),
+      L("cat"), L("sea"), L("kom"), pvNum(d), d.mod ? "○" : "", d.memo]; });
   download(`osaru_george_${today()}.csv`, "﻿" + [head, ...rows].map(r => r.map(q).join(",")).join("\r\n"), "text/csv");
   flash("CSVを書き出しました");
 });
-render();
+
+buildFilters(); render(); stat();
 }
 </script>
 </body>
