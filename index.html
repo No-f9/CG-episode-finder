@@ -84,7 +84,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .card{display:flex;flex-direction:column;gap:6px;padding:16px;border:1.5px solid var(--line);border-radius:16px;background:var(--card)}
 .card.hl{outline:4px solid var(--hat);animation:pop .6s}
 @keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.02)}100%{transform:none}}
-@media (prefers-reduced-motion:reduce){.card.hl{animation:none}.pur{transition:none}}
+@media (prefers-reduced-motion:reduce){.prog .pb i{transition:none}.card.hl{animation:none}.pur{transition:none}}
 .meta{font-size:13px;color:var(--sub);display:flex;flex-wrap:wrap;gap:4px 10px}
 .meta b{color:var(--ink)}
 .card h3{margin:0;font-size:20px;line-height:1.3;font-weight:800}
@@ -103,6 +103,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .act{display:flex;gap:8px;margin-top:auto;padding-top:8px}
 .act button{flex:1;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .act button[aria-pressed=true]{background:var(--soft);border-color:var(--hat);font-weight:700}
+:root{--ok:light-dark(#2f7d32,#7fcf83);--okbg:light-dark(#eaf6e7,#18261a);--okline:light-dark(#9bcf92,#3e6b40)}
+.card.seen{background:var(--okbg);border-color:var(--okline);border-width:2px}
+.card.seen h3::before{content:"✓ ";color:var(--ok)}
+.act button.sn[aria-pressed=true]{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:800}
+.seenb{font-size:12px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--ok);color:#fff}
+.prog{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:14px 0 0;padding:12px 14px;border:1.5px solid var(--okline);border-radius:14px;background:var(--okbg)}
+.prog b{font-size:18px}
+.prog .pt{font-weight:700}
+.prog .pb{flex:1 1 180px;height:12px;border-radius:999px;background:light-dark(#d6e9d1,#2a3b2b);overflow:hidden}
+.prog .pb i{display:block;height:100%;background:var(--ok);border-radius:999px;transition:width .3s}
+.prog .pn{font-size:13px;color:var(--sub)}
+.seenc{font-size:14px;font-weight:700;color:var(--ok);margin-left:6px}
 .act button.ed{flex:1.2}
 .memo{margin:4px 0 0;padding:8px 10px;border-radius:10px;border-left:4px solid var(--fur);background:var(--chip);font-size:14px;white-space:pre-wrap}
 .memo b{display:block;font-size:12px;color:var(--sub)}
@@ -168,7 +180,7 @@ dialog form,dialog .dwrap{display:flex;flex-direction:column;max-height:calc(100
 footer{border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
 footer .wrap{padding-block:18px 28px}
 [hidden]{display:none!important}
-@media(max-width:600px){.lg{display:none}.sm{display:inline}.bar1{flex-wrap:nowrap;gap:6px}.count{font-size:18px}.count small{display:none}.sortf{font-size:0!important}.sortf select{font-size:15px;padding:6px 4px;max-width:96px}.bar1 .btn{padding:8px 10px;font-size:14px;white-space:nowrap}.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .q{grid-column:1/-1}header svg{width:44px;height:44px;border-radius:11px}}
+@media(max-width:600px){.lg{display:none}.sm{display:inline}.bar1{flex-wrap:nowrap;gap:6px}.count{font-size:18px}.count small{display:none}.seenc{font-size:13px}.sortf{font-size:0!important}.sortf select{font-size:15px;padding:6px 4px;max-width:96px}.bar1 .btn{padding:8px 10px;font-size:14px;white-space:nowrap}.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .q{grid-column:1/-1}header svg{width:44px;height:44px;border-radius:11px}}
 </style>
 </head>
 <body>
@@ -179,6 +191,7 @@ footer .wrap{padding-block:18px 28px}
 
 <main>
 <div class="wrap">
+<div class="prog" id="prog" aria-live="polite"></div>
 <h2>何を学ばせたい？<small>いくつでも選べます</small></h2>
 <div class="shelf" id="purposes"></div>
 
@@ -343,7 +356,7 @@ const DEF = {
 };
 
 // ---------- 保存データ ----------
-let store = {seen:[], fav:[], memo:{}, edit:{}, opt:{}};
+let store = {seen:[], fav:[], memo:{}, edit:{}, opt:{}, seenAt:{}};
 try { store = Object.assign(store, JSON.parse(localStorage.getItem("georgeLearn.v1") || "{}")); } catch(e) {}
 const save = () => { try { localStorage.setItem("georgeLearn.v1", JSON.stringify(store)); return true; } catch(e) { return false; } };
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e) {}
@@ -446,7 +459,22 @@ function buildFilters() {
   $("age").innerHTML = `<option value="">すべて</option>` + OPTS.age.map(x => `<option value="${esc(x.id)}"${x.id===st.age?" selected":""}>${esc(x.label)}</option>`).join("");
   ms($("chrF"), {field:"chr", sel:st.chr, empty:"すべて", lbl:"chrLab", onChange:render});
 }
-$("ssn").innerHTML += [...Array(15)].map((_,i) => `<option value="${i+1}">シーズン${i+1}</option>`).join("");
+function seasonOpts() {
+  const seen = new Set(store.seen), cur = $("ssn").value;
+  $("ssn").innerHTML = `<option value="">すべて</option>` + [...Array(15)].map((_, i) => {
+    const s = i + 1, all = D.filter(d => d.s === s), n = all.filter(d => seen.has(d.c)).length;
+    return `<option value="${s}">シーズン${s}（見た ${n}/${all.length}）</option>`; }).join("");
+  $("ssn").value = cur;
+}
+function progress() {
+  const ids = new Set(D.map(d => d.c)), n = store.seen.filter(c => ids.has(c)).length, all = D.length, pc = Math.round(n / all * 100);
+  $("prog").innerHTML = `<span class="pt">見た話</span><b>${n} / ${all}話</b><span class="pn">（${pc}%）</span>
+<span class="pb" role="progressbar" aria-label="見た話の割合" aria-valuemin="0" aria-valuemax="${all}" aria-valuenow="${n}"><i style="width:${n / all * 100}%"></i></span>
+<span class="pn">${n === all ? "全話見ました！" : `あと${all - n}話`}</span>`;
+  const sn = shown.filter(d => store.seen.includes(d.c)).length;
+  const el = $("count").querySelector(".seenc"); if (el) el.textContent = `見た ${sn}`;
+}
+seasonOpts();
 
 function match(d, skip) {
   if (skip!=="pur" && st.pur.size && !d.V.cat.some(p => st.pur.has(p))) return false;
@@ -471,12 +499,14 @@ function chipsHTML(key, field) {
 }
 const PV = ["B0CN5RFXMX","B0CWDZ2XK6","B0CZZL611T","B0D33T73CT","B0CXQ77H5P","B0CTWM2XL4","B0CWP22GMJ","B0CV36Z2TH","B0D2WDM4GW","B0D2WDVG1S","B0D33SM2TM","B0D1WP2HC3","B0CYPR3WHD","B0CYGQ62P2","B0GWKST9WK"];
 const pv = d => `<a class="pv" href="https://www.amazon.co.jp/gp/video/detail/${PV[d.s-1]}" target="_blank" rel="noopener">Prime Videoで見る<small>シーズン${d.s} の ${esc(pvNum(d))}話</small></a>`;
+const md = t => { const x = new Date(t); return isNaN(x) ? "" : `${x.getMonth()+1}/${x.getDate()}`; };
+const seenBadge = c => `<span class="seenb">見た${store.seenAt[c] ? " " + md(store.seenAt[c]) : ""}</span>`;
 function card(d) {
   const seen = store.seen.includes(d.c), fav = store.fav.includes(d.c), V = d.V;
   const tags = [...labs("cat", V.cat), ...labs("sea", V.sea), ...labs("country", V.country)].map(t => `<span class="tag">${esc(t)}</span>`).join("");
   const kom = labs("kom", V.kom).join("、"), chr = labs("chr", V.chr).join("、"), but = labs("butai", V.butai).join("・");
-  return `<article class="card" id="c-${d.c}">
-<div class="meta"><b>${d.c}</b><span>第${d.k}回</span>${labs("age", V.age).map(a => `<span>${esc(a)}</span>`).join("")}${but?`<span>${esc(but)}</span>`:""}${d.mod?`<span class="badge">修正あり</span>`:""}</div>
+  return `<article class="card${seen?" seen":""}" id="c-${d.c}">
+<div class="meta"><b>${d.c}</b>${seen?seenBadge(d.c):""}<span>第${d.k}回</span>${labs("age", V.age).map(a => `<span>${esc(a)}</span>`).join("")}${but?`<span>${esc(but)}</span>`:""}${d.mod?`<span class="badge">修正あり</span>`:""}</div>
 <h3>${esc(d.j)}</h3><div class="en">${esc(d.e)}</div>
 <p class="theme">${esc(d.t)}</p><p class="syn">${esc(d.y)}</p>
 ${tags?`<div class="tags">${tags}</div>`:""}
@@ -485,7 +515,7 @@ ${d.h?`<p class="note"><b>見たあとに</b>${esc(d.h)}</p>`:""}
 ${chr?`<div class="meta">登場：${esc(chr)}</div>`:""}
 ${d.memo?`<p class="memo"><b>メモ</b>${esc(d.memo)}</p>`:""}
 ${pv(d)}
-<div class="act"><button data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
+<div class="act"><button class="sn" data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"✓ 見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
 </article>`;
 }
 let shown = [], limit = 30, lastSig = "";
@@ -527,7 +557,7 @@ function render() {
   shown = D.filter(d => match(d));
   if (st.sort==="new") shown.reverse();
   if (st.sort==="rnd") shown.sort(() => Math.random() - .5);
-  $("count").innerHTML = `${shown.length}話<small> 見つかりました</small>`;
+  $("count").innerHTML = `${shown.length}話<small> 見つかりました</small><span class="seenc"></span>`; progress();
   $("results").innerHTML = shown.length ? shown.slice(0, limit).map(card).join("") :
     `<div class="empty">条件に合う話がありません。条件を少し減らしてみてください。</div>`;
   const rest = shown.length - Math.min(limit, shown.length);
@@ -550,10 +580,18 @@ document.addEventListener("click", e => {
     if (st[k] instanceof Set) st[k].delete(v); else if (typeof st[k] === "boolean") st[k] = false; else st[k] = "";
     syncControls(); render();
     const nx = $("cond").querySelector("button"); (nx || $("count")).focus?.(); return; }
-  if (b.dataset.a) { const arr = store[b.dataset.a], c = b.dataset.c, i = arr.indexOf(c);
-    i < 0 ? arr.push(c) : arr.splice(i, 1); save(); stat();
-    const on = i < 0; b.setAttribute("aria-pressed", on);
-    b.textContent = b.dataset.a==="seen" ? (on?"見た":"見たら押す") : (on?"お気に入り済み":"お気に入り");
+  if (b.dataset.a) { const arr = store[b.dataset.a], c = b.dataset.c, i = arr.indexOf(c), on = i < 0;
+    on ? arr.push(c) : arr.splice(i, 1);
+    if (b.dataset.a === "seen") { on ? store.seenAt[c] = new Date().toISOString() : delete store.seenAt[c]; }
+    save(); stat();
+    b.setAttribute("aria-pressed", on);
+    if (b.dataset.a === "seen") {
+      b.textContent = on ? "✓ 見た" : "見たら押す";
+      const cd = b.closest(".card"); cd.classList.toggle("seen", on);
+      const meta = cd.querySelector(".meta"), old = meta.querySelector(".seenb");
+      if (old) old.remove(); if (on) meta.querySelector("b").insertAdjacentHTML("afterend", seenBadge(c));
+      progress(); seasonOpts();
+    } else b.textContent = on ? "お気に入り済み" : "お気に入り";
     if (st.unseen || st.fav) render(); return; }
 });
 const tg = (id, key) => $(id).addEventListener("click", () => { st[key] = !st[key]; $(id).setAttribute("aria-pressed", st[key]); render(); });
@@ -734,6 +772,7 @@ $("bkFile").addEventListener("change", async e => {
     const ok = new Set(D.map(d => d.c)), only = o => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ok.has(k)));
     store.seen = uniq([...store.seen, ...j.seen.filter(c => ok.has(c))]);
     store.fav = uniq([...store.fav, ...j.fav.filter(c => ok.has(c))]);
+    Object.assign(store.seenAt, only(j.seenAt)); seasonOpts();
     const ed = JSON.parse(JSON.stringify(only(j.edit))); migrate(ed);
     Object.assign(store.memo, only(j.memo)); Object.assign(store.edit, ed);
     MF.forEach(([k]) => { const o = j.opt && j.opt[k]; if (o && typeof o === "object")
@@ -744,10 +783,11 @@ $("bkFile").addEventListener("change", async e => {
 });
 $("csvOut").addEventListener("click", () => {
   const q = v => { v = String(v ?? ""); return /[",\n\r]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; };
-  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー（元データ）","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事の具体例","困りごとの具体例","家でできる実験・工作","登場キャラクター","カテゴリー（学びの目的）","季節・行事","生活の困りごと","Prime Video話数","修正あり","メモ"];
+  const head = ["回","シーズン","話数","タイトル（邦題 / 原題）","舞台","教育カテゴリー（元データ）","具体的テーマ・学び","対象年齢目安","あらすじ","国・地域","季節・行事の具体例","困りごとの具体例","家でできる実験・工作","登場キャラクター","カテゴリー（学びの目的）","季節・行事","生活の困りごと","Prime Video話数","修正あり","メモ","見た","見た日","お気に入り"];
   const rows = D.map(d => { const L = f => labs(f, d.V[f]).join("、");
     return [d.k, d.s, d.c, `${d.j} / ${d.e}`, labs("butai", d.V.butai).join("・"), ORIG[d.c].g, d.t, L("age"), d.y, L("country"), d.m, d.p, d.h, L("chr"),
-      L("cat"), L("sea"), L("kom"), pvNum(d), d.mod ? "○" : "", d.memo]; });
+      L("cat"), L("sea"), L("kom"), pvNum(d), d.mod ? "○" : "", d.memo,
+      store.seen.includes(d.c) ? "○" : "", store.seenAt[d.c] ? new Date(store.seenAt[d.c]).toLocaleDateString("ja-JP") : "", store.fav.includes(d.c) ? "○" : ""]; });
   download(`osaru_george_${today()}.csv`, "﻿" + [head, ...rows].map(r => r.map(q).join(",")).join("\r\n"), "text/csv");
   flash("CSVを書き出しました");
 });
