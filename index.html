@@ -57,8 +57,26 @@ input[type=search],select{min-height:46px;font:inherit;font-size:16px;padding:8p
 .toggles{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--fur);outline-offset:2px}
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-top:24px}
-.bar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-block:10px}
+.bar .wrap{display:flex;flex-direction:column;gap:6px;padding-block:8px}
+.bar1{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.sortf{flex-direction:row!important;align-items:center;gap:6px}
+.sortf select{min-height:44px}
+.cond{display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.cond:empty{display:none}
+.cond .cl{flex:none;font-size:13px;font-weight:700;color:var(--sub)}
+.cond button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:4px 6px 4px 12px;border-radius:999px;border:1.5px solid var(--fur);background:var(--soft);color:var(--ink);font:inherit;font-size:14px;font-weight:700;white-space:nowrap;cursor:pointer}
+.cond button .xx{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fur);color:#fff;font-size:13px;line-height:1}
+.cond button.all{border-color:var(--line);background:transparent;padding-right:12px;font-weight:500}
+.cond .none{flex:none;font-size:14px;color:var(--sub)}
+.more{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;padding:0 0 40px}
+.more:empty{display:none}
+.more .info{width:100%;text-align:center;font-size:14px;color:var(--sub)}
+.totop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;width:56px;height:56px;border:none;border-radius:50%;background:var(--fur);color:#fff;font:inherit;font-size:20px;font-weight:800;line-height:1;box-shadow:0 4px 14px rgba(40,24,10,.35);cursor:pointer}
+.totop span{font-size:11px;font-weight:700;margin-top:2px}
+.totop[hidden]{display:none}
 .count{font-weight:800;font-size:20px;margin-right:auto}
+.bar1 .count{flex:1 1 auto;white-space:nowrap}
+.sm{display:none}
 .count small{font-size:14px;font-weight:500;color:var(--sub)}
 .btn{min-height:44px;padding:8px 16px;border-radius:12px;border:none;background:var(--fur);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
@@ -150,7 +168,7 @@ dialog form,dialog .dwrap{display:flex;flex-direction:column;max-height:calc(100
 footer{border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
 footer .wrap{padding-block:18px 28px}
 [hidden]{display:none!important}
-@media(max-width:600px){.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .q{grid-column:1/-1}header svg{width:44px;height:44px;border-radius:11px}}
+@media(max-width:600px){.lg{display:none}.sm{display:inline}.bar1{flex-wrap:nowrap;gap:6px}.count{font-size:18px}.count small{display:none}.sortf{font-size:0!important}.sortf select{font-size:15px;padding:6px 4px;max-width:96px}.bar1 .btn{padding:8px 10px;font-size:14px;white-space:nowrap}.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .q{grid-column:1/-1}header svg{width:44px;height:44px;border-radius:11px}}
 </style>
 </head>
 <body>
@@ -182,14 +200,19 @@ footer .wrap{padding-block:18px 28px}
 </div>
 </div>
 
-<div class="bar"><div class="wrap">
-<div class="count" id="count"></div>
-<label class="f" style="flex-direction:row;align-items:center;gap:6px">並び順<select id="sort"><option value="ep">放送順</option><option value="new">新しい順</option><option value="rnd">ランダム</option></select></label>
-<button class="btn" id="pick">おまかせで1話</button>
-<button class="btn ghost" id="clear">条件をクリア</button>
+<div class="bar" id="bar"><div class="wrap">
+<div class="bar1">
+<div class="count" id="count" aria-live="polite"></div>
+<label class="f sortf">並び順<select id="sort"><option value="ep">放送順</option><option value="new">新しい順</option><option value="rnd">ランダム</option></select></label>
+<button class="btn" id="pick"><span class="lg">おまかせで1話</span><span class="sm">おまかせ</span></button>
+<button class="btn ghost" id="toCond"><span class="lg">条件を変える ↑</span><span class="sm">条件 ↑</span></button>
+</div>
+<div class="cond" id="cond"></div>
 </div></div>
 
-<div class="wrap"><div class="results" id="results"></div></div>
+<div class="wrap"><div class="results" id="results"></div>
+<div class="more" id="more"></div></div>
+<button class="totop" id="toTop" aria-label="いちばん上へ戻る" hidden>↑<span>上へ</span></button>
 </main>
 
 <dialog id="dlg" aria-labelledby="dTitle">
@@ -465,8 +488,39 @@ ${pv(d)}
 <div class="act"><button data-a="seen" data-c="${d.c}" aria-pressed="${seen}">${seen?"見た":"見たら押す"}</button><button data-a="fav" data-c="${d.c}" aria-pressed="${fav}">${fav?"お気に入り済み":"お気に入り"}</button><button class="ed" data-edit="${d.c}">メモ・修正</button></div>
 </article>`;
 }
-let shown = [];
+let shown = [], limit = 30, lastSig = "";
+const PAGE = 30;
+const sig = () => JSON.stringify(st, (k, v) => v instanceof Set ? [...v].sort() : v);
+function condList() {
+  const L = [];
+  st.pur.forEach(v => L.push(["pur", v, LAB.cat[v]]));
+  st.kom.forEach(v => L.push(["kom", v, LAB.kom[v]]));
+  st.sea.forEach(v => L.push(["sea", v, LAB.sea[v]]));
+  st.chr.forEach(v => L.push(["chr", v, LAB.chr[v]]));
+  if (st.q) L.push(["q", "", `「${st.q}」`]);
+  if (st.age) L.push(["age", "", LAB.age[st.age] || st.age]);
+  if (st.ssn) L.push(["ssn", "", `シーズン${st.ssn}`]);
+  [["home","家でできる実験・工作"],["world","海外が舞台"],["unseen","まだ見ていない"],["fav","お気に入り"],["memo","メモ・修正あり"]].forEach(([k, l]) => st[k] && L.push([k, "", l]));
+  return L.filter(x => x[2]);
+}
+function renderCond() {
+  const L = condList();
+  $("cond").innerHTML = L.length
+    ? `<span class="cl">条件</span>` + L.map(([k, v, l]) => `<button data-rm="${k}" data-v="${esc(v)}" aria-label="${esc(l)} の条件をはずす">${esc(l)}<span class="xx" aria-hidden="true">×</span></button>`).join("") + (L.length > 1 ? `<button class="all" data-rm="all">すべてはずす</button>` : "")
+    : `<span class="none">条件なし（全話）</span>`;
+}
+function syncControls() {
+  $("q").value = st.q; $("age").value = st.age; $("ssn").value = st.ssn; msText($("chrF"));
+  $("chrF").querySelectorAll(".ms-opt input").forEach(i => i.checked = st.chr.has(i.value));
+  [["tHome","home"],["tWorld","world"],["tUnseen","unseen"],["tFav","fav"],["tMemo","memo"]].forEach(([id, k]) => $(id).setAttribute("aria-pressed", st[k]));
+}
+function clearAll() {
+  ["pur","kom","sea","chr"].forEach(k => st[k].clear());
+  Object.assign(st, {q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false});
+  syncControls(); render();
+}
 function render() {
+  const sg = sig(); if (sg !== lastSig) { lastSig = sg; limit = PAGE; }
   $("purposes").innerHTML = chipsHTML("pur", "cat");
   $("komari").innerHTML = chipsHTML("kom", "kom");
   $("season").innerHTML = chipsHTML("sea", "sea");
@@ -474,14 +528,28 @@ function render() {
   if (st.sort==="new") shown.reverse();
   if (st.sort==="rnd") shown.sort(() => Math.random() - .5);
   $("count").innerHTML = `${shown.length}話<small> 見つかりました</small>`;
-  $("results").innerHTML = shown.length ? shown.map(card).join("") :
+  $("results").innerHTML = shown.length ? shown.slice(0, limit).map(card).join("") :
     `<div class="empty">条件に合う話がありません。条件を少し減らしてみてください。</div>`;
+  const rest = shown.length - Math.min(limit, shown.length);
+  $("more").innerHTML = rest > 0
+    ? `<p class="info">${shown.length}話のうち ${limit}話を表示中</p><button class="btn" id="moreBtn">あと${Math.min(PAGE, rest)}話を表示</button>${rest > PAGE ? `<button class="btn ghost" id="allBtn">残り${rest}話をすべて表示</button>` : ""}`
+    : shown.length > PAGE ? `<p class="info">${shown.length}話をすべて表示しました</p>` : "";
   $("pick").disabled = !shown.length;
+  renderCond();
 }
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || b.closest(".ms")) return;
   if (b.dataset.k) { const set = st[b.dataset.k]; set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v); render(); return; }
   if (b.dataset.edit) { openEdit(b.dataset.edit); return; }
+  if (b.id === "moreBtn" || b.id === "allBtn") {
+    const first = limit; limit = b.id === "allBtn" ? shown.length : limit + PAGE; render();
+    const el = $("results").children[first]; if (el) { el.setAttribute("tabindex", "-1"); el.focus({preventScroll:true}); }
+    return; }
+  if (b.dataset.rm) { const k = b.dataset.rm, v = b.dataset.v;
+    if (k === "all") { clearAll(); return; }
+    if (st[k] instanceof Set) st[k].delete(v); else if (typeof st[k] === "boolean") st[k] = false; else st[k] = "";
+    syncControls(); render();
+    const nx = $("cond").querySelector("button"); (nx || $("count")).focus?.(); return; }
   if (b.dataset.a) { const arr = store[b.dataset.a], c = b.dataset.c, i = arr.indexOf(c);
     i < 0 ? arr.push(c) : arr.splice(i, 1); save(); stat();
     const on = i < 0; b.setAttribute("aria-pressed", on);
@@ -494,16 +562,21 @@ let tmr; $("q").addEventListener("input", e => { clearTimeout(tmr); tmr = setTim
 ["age","ssn","sort"].forEach(id => $(id).addEventListener("change", e => { st[id] = e.target.value; render(); }));
 $("pick").addEventListener("click", () => {
   if (!shown.length) return;
-  const d = shown[Math.floor(Math.random() * shown.length)], el = $("c-" + d.c);
+  const i = Math.floor(Math.random() * shown.length), d = shown[i];
+  if (i >= limit) { limit = Math.ceil((i + 1) / PAGE) * PAGE; render(); }
+  const el = $("c-" + d.c);
   document.querySelectorAll(".card.hl").forEach(x => x.classList.remove("hl"));
   if (el) { el.classList.add("hl"); el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center"}); }
 });
-$("clear").addEventListener("click", () => {
-  ["pur","kom","sea","chr"].forEach(k => st[k].clear());
-  Object.assign(st, {q:"", age:"", ssn:"", home:false, world:false, unseen:false, fav:false, memo:false});
-  $("q").value = ""; ["age","ssn"].forEach(id => $(id).value = ""); msText($("chrF"));
-  ["tHome","tWorld","tUnseen","tFav","tMemo"].forEach(id => $(id).setAttribute("aria-pressed", "false")); render();
-});
+const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+$("toCond").addEventListener("click", () => { scrollTo({top:0, behavior:reduce()}); $("purposes").querySelector("button")?.focus({preventScroll:true}); });
+$("toTop").addEventListener("click", () => { scrollTo({top:0, behavior:reduce()}); $("purposes").querySelector("button")?.focus({preventScroll:true}); });
+const onScroll = () => {
+  const y = scrollY, barTop = $("bar").getBoundingClientRect().top;
+  $("toTop").hidden = y < 900;
+  $("toCond").hidden = barTop > 1; // 条件エリアが見えているあいだは不要
+};
+addEventListener("scroll", onScroll, {passive:true}); addEventListener("resize", onScroll);
 
 // ---------- メモ・修正の画面 ----------
 const dlg = $("dlg"); let cur = null, opener = null, dsel = {};
@@ -679,7 +752,7 @@ $("csvOut").addEventListener("click", () => {
   flash("CSVを書き出しました");
 });
 
-buildFilters(); render(); stat();
+buildFilters(); render(); stat(); onScroll();
 }
 </script>
 </body>
